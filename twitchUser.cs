@@ -9,9 +9,12 @@ class twitchUser{
     public float voiceRate { get; set; }
     public bool ignored {get; set;}
 
-    public twitchUser(string name, string alias, int voiceNumber = 0, float voiceRate = (float)200.0, bool ignored = false){
+    public twitchUser(string name, string alias = null, int voiceNumber = 0, float voiceRate = (float)200.0, bool ignored = false){
 
-        this.name = name;
+        this.name = name.ToLower();
+        // set alias to name if not present
+        if (alias == null)
+        {alias = name;}
         this.alias = alias;
         this.voiceNumber = voiceNumber;
         this.voiceRate = voiceRate;

@@ -46,14 +46,14 @@ class twitchUsers
     public twitchUser getUser(twitchUser user)
     {
 
-        return users.Find(x => x.name == user.name);
+        return users.Find(x => x.name.ToLower() == user.name.ToLower());
 
     }
 
     public bool isUserInList(twitchUser user)
     {
 
-        if (users.Find(x => x.name == user.name) != null)
+        if (users.Find(x => x.name.ToLower() == user.name.ToLower()) != null)
         {
             return true;
         }

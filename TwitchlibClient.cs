@@ -177,8 +177,10 @@ namespace TestConsole
             case "!ignorelist":
                 break;
             case "!ignore":
+                SetIgnore(e);
                 break;
             case "!unignore":
+                SetUnignore(e);
                 break;
             case "!speed":
                 break;
@@ -234,11 +236,6 @@ namespace TestConsole
                 twitchUser user = new twitchUser(e.ChatMessage.Username, alias);
                 if (user != null){
 
-                    //System.Console.WriteLine("Got this far");
-                    //System.Console.WriteLine(e.ChatMessage.Username);
-                    //System.Console.WriteLine(alias);
-                    // check if user already exists
-                    //System.Console.WriteLine(users.isUserInList(user).ToString());
                     if (users.isUserInList(user)){
 
                         user = users.getUser(user);
@@ -248,14 +245,7 @@ namespace TestConsole
                     }
                     else{
 
-                    //System.Console.WriteLine(users.ToString());
-                    //System.Console.WriteLine(users.users.Count.ToString());
-
                     users.addUser(user);
-
-                    //System.Console.WriteLine(user.ToString());
-                    //System.Console.WriteLine(users.ToString());
-                    //System.Console.WriteLine(users.users.Count.ToString());
 
                     }
 
@@ -264,6 +254,67 @@ namespace TestConsole
                     users.save();
 
                 }
+
+
+            }
+
+
+        }
+
+        private void SetIgnore(OnMessageReceivedArgs e){
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 1){
+                twitchUser user = new twitchUser(wordList[1]);
+                if (user != null){
+
+                    if (users.isUserInList(user)){
+
+                        user = users.getUser(user);
+                        users.removeUser(user);
+                        user.ignored = true;
+                        users.addUser(user);
+                    }
+                    else{
+
+                    user.ignored = true;
+                    users.addUser(user);
+
+                    }
+
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("{0} will be ignored.", user.name));
+                    users.save();
+
+                }                
+
+            }
+
+        }
+
+        private void SetUnignore(OnMessageReceivedArgs e){
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 1){
+
+                twitchUser user = new twitchUser(wordList[1]);
+                if (user != null){
+
+                    if (users.isUserInList(user)){
+
+                        user = users.getUser(user);
+                        users.removeUser(user);
+                        user.ignored = false;
+                        users.addUser(user);
+                    }
+                    else{
+
+                    user.ignored = false;
+                    users.addUser(user);
+
+                    }
+
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("{0} will not be ignored.", user.name));
+                    users.save();
+
+                }  
 
 
             }
