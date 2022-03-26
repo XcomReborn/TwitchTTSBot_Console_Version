@@ -61,43 +61,60 @@ class twitchUsers
     }
 
 
-    public void load()
+    public bool load()
     {
-
-        FileStream fs = new FileStream("test.json", FileMode.Open, FileAccess.Read);
-        StreamReader sr = new StreamReader(fs);
-        sr.BaseStream.Seek(0, SeekOrigin.Begin);
-        string str = sr.ReadLine();
-        while (str != null)
+        if (File.Exists("data.json"))
         {
-            Console.WriteLine(str);
-            List<twitchUser>? twitchUsers = JsonSerializer.Deserialize<List<twitchUser>>(str);
-            this.users = twitchUsers;
+
+            try
+            {
+                FileStream fs = new FileStream("data.json", FileMode.Open, FileAccess.Read);
+                StreamReader sr = new StreamReader(fs);
+                sr.BaseStream.Seek(0, SeekOrigin.Begin);
+                string str = sr.ReadLine();
+                if (str != null)
+                {
+                    Console.WriteLine(str);
+                    List<twitchUser>? twitchUsers = JsonSerializer.Deserialize<List<twitchUser>>(str);
+                    this.users = twitchUsers;
+                }
+                sr.Close();
+                fs.Close();
+            }
+            catch
+            {
+                System.Console.WriteLine("A problem occurred while trying to load twitchUsers");
+                return false;
+            }
         }
 
-
-
-        sr.Close();
-        fs.Close();
+        return true;
 
     }
 
-    public void save()
+    public bool save()
     {
-
-        FileStream fs = new FileStream("test.json", FileMode.Create, FileAccess.Write);
+        try{
+        FileStream fs = new FileStream("data.json", FileMode.Create, FileAccess.Write);
         StreamWriter sw = new StreamWriter(fs);
         string userJson = JsonSerializer.Serialize(users);
         sw.WriteLine(userJson);
         sw.Flush();
         sw.Close();
         fs.Close();
+        }
+        catch{
+            System.Console.WriteLine("A problem occurred while trying to save twitchUsers");
+            return false;
+        }
+        return true;
     }
 
-        public override string ToString()
+    public override string ToString()
     {
         string output = "";
-        foreach (twitchUser user in users){
+        foreach (twitchUser user in users)
+        {
 
             output += user.ToString() + "\n";
         }

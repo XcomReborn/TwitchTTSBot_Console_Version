@@ -19,11 +19,8 @@ namespace TestConsole
         static void Main(string[] args)
         {
 
-
         Bot bot = new Bot();
-
-        System.Console.ReadLine() ;
-
+        Console.ReadLine();
 
         }
     }
