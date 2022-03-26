@@ -13,14 +13,14 @@ using System.Text.RegularExpressions;
 namespace TestConsole
 {
 
-    
+
     class Program
     {
         static void Main(string[] args)
         {
 
-        Bot bot = new Bot();
-        Console.ReadLine();
+            Bot bot = new Bot();
+            Console.ReadLine();
 
         }
     }
@@ -34,7 +34,7 @@ namespace TestConsole
         public twitchUsers users = new twitchUsers();
 
         private string previousUserName = "";
-	
+
         public Bot()
         {
 
@@ -42,11 +42,11 @@ namespace TestConsole
             users.load();
 
             ConnectionCredentials credentials = new ConnectionCredentials("COHopponentBot", "oauth:6lwp9xs2oye948hx2hpv5hilldl68g");
-	    var clientOptions = new ClientOptions
-                {
-                    MessagesAllowedInPeriod = 750,
-                    ThrottlingPeriod = TimeSpan.FromSeconds(30)
-                };
+            var clientOptions = new ClientOptions
+            {
+                MessagesAllowedInPeriod = 750,
+                ThrottlingPeriod = TimeSpan.FromSeconds(30)
+            };
             WebSocketClient customClient = new WebSocketClient(clientOptions);
             client = new TwitchClient(customClient);
             client.Initialize(credentials, "xcomreborn");
@@ -60,17 +60,17 @@ namespace TestConsole
 
             client.Connect();
         }
-  
+
         private void Client_OnLog(object sender, OnLogArgs e)
         {
             Console.WriteLine($"{e.DateTime.ToString()}: {e.BotUsername} - {e.Data}");
         }
-  
+
         private void Client_OnConnected(object sender, OnConnectedArgs e)
         {
             Console.WriteLine($"Connected to {e.AutoJoinChannel}");
         }
-  
+
         private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
             Console.WriteLine("Hey guys! I am a bot connected via TwitchLib!");
@@ -91,13 +91,13 @@ namespace TestConsole
 
 
         }
-        
+
         private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
         {
             if (e.WhisperMessage.Username == "my_friend")
                 client.SendWhisper(e.WhisperMessage.Username, "Hey! Whispers are so cool!!");
         }
-        
+
         private void Client_OnNewSubscriber(object sender, OnNewSubscriberArgs e)
         {
             if (e.Subscriber.SubscriptionPlan == SubscriptionPlan.Prime)
@@ -106,150 +106,171 @@ namespace TestConsole
                 client.SendMessage(e.Channel, $"Welcome {e.Subscriber.DisplayName} to the substers! You just earned 500 points!");
         }
 
-    private void Speak(OnMessageReceivedArgs e){
+        private void Speak(OnMessageReceivedArgs e)
+        {
 
-            // Initialize a new instance of the SpeechSynthesizer.  
-            SpeechSynthesizer synth = new SpeechSynthesizer();  
 
-            // Configure the audio output.   
-            synth.SetOutputToDefaultAudioDevice();  
 
             string userName = e.ChatMessage.Username;
 
             //check for alias
-            twitchUser user = new twitchUser(userName, "");
-            if (users.isUserInList(user)){  
+            twitchUser user = new twitchUser(userName);
+            if (users.isUserInList(user))
+            {
                 user = users.getUser(user);
                 userName = user.alias;
             }
 
-            //only use username said something, if not saying for first time in a row.
-            string spokenString = "";
-            if (previousUserName == userName){
+            // ensure message is not null
+            if (e.ChatMessage.Message != null){
 
-                spokenString = e.ChatMessage.Message;
+            // if the user exists they might be set to ignore or message starts with ! char
+            if ((!user.ignored) || (e.ChatMessage.Message[0] == "!"[0]))
+            {
+
+                //only use username said something, if not saying for first time in a row.
+                string spokenString = "";
+                if (previousUserName == userName)
+                {
+
+                    spokenString = e.ChatMessage.Message;
+
+                }
+                else
+                {
+                    spokenString = userName + " said " + e.ChatMessage.Message;
+                }
+                // Initialize a new instance of the SpeechSynthesizer.  
+                SpeechSynthesizer synth = new SpeechSynthesizer();
+
+                // Configure the audio output.   
+                synth.SetOutputToDefaultAudioDevice();
+
+                // Speak a string.  
+                synth.Speak(spokenString);
+
+                previousUserName = userName;
+            }
 
             }
-            else{
-            spokenString = userName + " said " + e.ChatMessage.Message;
-            }
-            // Speak a string.  
-            synth.Speak(spokenString);  
 
-            previousUserName = userName;
+        }
 
-    }
-
-        private void CheckForChatCommands(OnMessageReceivedArgs e){
+        private void CheckForChatCommands(OnMessageReceivedArgs e)
+        {
 
 
             string[] words = e.ChatMessage.Message.Split(' ');
 
-            if (words.Length > 0){
-
-
-
-            // Broadcaster Commands
-            if (e.ChatMessage.IsBroadcaster){
-            switch(words[0]) 
+            if (words.Length > 0)
             {
-            
-            case "!closetts":
-                CloseTTS();
-                break;
-            default:
-                // code block
-                break;
-            }
+
+
+
+                // Broadcaster Commands
+                if (e.ChatMessage.IsBroadcaster)
+                {
+                    switch (words[0])
+                    {
+
+                        case "!closetts":
+                            CloseTTS();
+                            break;
+                        default:
+                            // code block
+                            break;
+                    }
+
+                }
+
+                if ((e.ChatMessage.IsModerator) || (e.ChatMessage.IsBroadcaster))
+                {
+
+                    switch (words[0])
+                    {
+                        case "!alias":
+                            SetAlias(e);
+                            break;
+                        case "!voice":
+                            break;
+                        case "!blacklist":
+                        case "!ignorelist":
+                            break;
+                        case "!ignore":
+                            SetIgnore(e);
+                            break;
+                        case "!unignore":
+                            SetUnignore(e);
+                            break;
+                        case "!speed":
+                            break;
+                        case "!volume":
+                            break;
+
+
+                        default:
+                            // code block
+                            break;
+                    }
+
+
+                }
+
+
+                switch (words[0])
+                {
+                    case "!voices":
+                        // code block
+                        break;
+                    default:
+                        // code block
+                        break;
+                }
 
             }
 
-            if ((e.ChatMessage.IsModerator) || (e.ChatMessage.IsBroadcaster)){
-
-            switch(words[0]) 
-            {
-            case "!alias":
-                SetAlias(e);
-                break;
-            case "!voice":
-                break;
-            case "!blacklist":
-            case "!ignorelist":
-                break;
-            case "!ignore":
-                SetIgnore(e);
-                break;
-            case "!unignore":
-                SetUnignore(e);
-                break;
-            case "!speed":
-                break;
-            case "!volume":
-                break;
-
-            
-            default:
-                // code block
-                break;
-            }
-
-
-            }
-
-
-            switch(words[0]) 
-            {
-            case "!voices":
-                // code block
-                break;
-            default:
-                // code block
-                break;
-            }
-
-            }
 
 
 
- 
         }
 
-        private void CloseTTS(){
+        private void CloseTTS()
+        {
 
             System.Console.WriteLine("Closing TTS.");
 
-            client.Disconnect();
-
-            //wait until disconnected
-            while (client.IsConnected){};
-
+            // BruteForce the Exit
             Environment.Exit(0);
-            
 
         }
 
-        private void SetAlias(OnMessageReceivedArgs e){
+        private void SetAlias(OnMessageReceivedArgs e)
+        {
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
-            if (wordList.Length > 1){
-                string alias = Sanitize (wordList[1]);
+            if (wordList.Length > 1)
+            {
+                string alias = Sanitize(wordList[1]);
                 twitchUser user = new twitchUser(e.ChatMessage.Username, alias);
-                if (user != null){
+                if (user != null)
+                {
 
-                    if (users.isUserInList(user)){
+                    if (users.isUserInList(user))
+                    {
 
                         user = users.getUser(user);
                         users.removeUser(user);
                         user.alias = alias;
                         users.addUser(user);
                     }
-                    else{
+                    else
+                    {
 
-                    users.addUser(user);
+                        users.addUser(user);
 
                     }
 
-                    client.SendMessage(e.ChatMessage.Channel, String.Format("{0}'s alias has been set to {1}", e.ChatMessage.Username ,alias));
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("{0}'s alias has been set to {1}", e.ChatMessage.Username, alias));
 
                     users.save();
 
@@ -261,60 +282,70 @@ namespace TestConsole
 
         }
 
-        private void SetIgnore(OnMessageReceivedArgs e){
+        private void SetIgnore(OnMessageReceivedArgs e)
+        {
             string[] wordList = e.ChatMessage.Message.Split(' ');
-            if (wordList.Length > 1){
+            if (wordList.Length > 1)
+            {
                 twitchUser user = new twitchUser(wordList[1]);
-                if (user != null){
+                if (user != null)
+                {
 
-                    if (users.isUserInList(user)){
+                    if (users.isUserInList(user))
+                    {
 
                         user = users.getUser(user);
                         users.removeUser(user);
                         user.ignored = true;
                         users.addUser(user);
                     }
-                    else{
+                    else
+                    {
 
-                    user.ignored = true;
-                    users.addUser(user);
+                        user.ignored = true;
+                        users.addUser(user);
 
                     }
 
                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0} will be ignored.", user.name));
                     users.save();
 
-                }                
+                }
 
             }
 
         }
 
-        private void SetUnignore(OnMessageReceivedArgs e){
+        private void SetUnignore(OnMessageReceivedArgs e)
+        {
             string[] wordList = e.ChatMessage.Message.Split(' ');
-            if (wordList.Length > 1){
+            if (wordList.Length > 1)
+            {
 
                 twitchUser user = new twitchUser(wordList[1]);
-                if (user != null){
+                if (user != null)
+                {
 
-                    if (users.isUserInList(user)){
+                    if (users.isUserInList(user))
+                    {
 
                         user = users.getUser(user);
                         users.removeUser(user);
                         user.ignored = false;
                         users.addUser(user);
                     }
-                    else{
+                    else
+                    {
 
-                    user.ignored = false;
-                    users.addUser(user);
+                        user.ignored = false;
+                        users.addUser(user);
 
                     }
 
                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0} will not be ignored.", user.name));
                     users.save();
 
-                }  
+                }
 
 
             }
@@ -322,10 +353,11 @@ namespace TestConsole
 
         }
 
-        private string Sanitize(string str){
+        private string Sanitize(string str)
+        {
 
             // Allowed Characters only allowed in alias
-            string pattern = @"[^a-zA-Z0-9 -.&,%£+=?*@!#]";  
+            string pattern = @"[^a-zA-Z0-9 -.&,%£+=?*@!#]";
             // Create a Regex  
             Regex rg = new Regex(pattern);
 
@@ -333,7 +365,7 @@ namespace TestConsole
 
             return match;
 
-        } 
+        }
 
 
 
