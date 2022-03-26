@@ -1,7 +1,7 @@
 
 
 [System.Serializable]
-class twitchUser{
+class TwitchUser{
 
     public string name { get; set; }
     public string alias { get; set; }
@@ -9,7 +9,7 @@ class twitchUser{
     public float voiceRate { get; set; }
     public bool ignored {get; set;}
 
-    public twitchUser(string name, string alias = null, int voiceNumber = 0, float voiceRate = (float)200.0, bool ignored = false){
+    public TwitchUser(string name, string alias = null, int voiceNumber = 0, float voiceRate = (float)200.0, bool ignored = false){
 
         this.name = name.ToLower();
         // set alias to name if not present

@@ -2,14 +2,14 @@
 using System.Collections;
 using System.Text.Json;
 
-class twitchUsers
+class TwitchUsers
 {
 
-    public List<twitchUser> users { get; set; }
+    public List<TwitchUser> users { get; set; }
 
-    public twitchUsers()
+    public TwitchUsers()
     {
-        users = new List<twitchUser>();
+        users = new List<TwitchUser>();
     }
 
     public bool addUser(string username, string alias, int voiceNumber = 0, float voiceRate = 200)
@@ -17,7 +17,7 @@ class twitchUsers
 
         try
         {
-            users.Add(new twitchUser(username, alias, voiceNumber, voiceRate));
+            users.Add(new TwitchUser(username, alias, voiceNumber, voiceRate));
         }
         catch
         {
@@ -26,7 +26,7 @@ class twitchUsers
         return true;
     }
 
-    public bool addUser(twitchUser user)
+    public bool addUser(TwitchUser user)
     {
         try
         {
@@ -36,21 +36,22 @@ class twitchUsers
         return true;
     }
 
-    public bool removeUser(twitchUser user)
+    public bool removeUser(TwitchUser user)
     {
 
         return users.Remove(user);
 
     }
 
-    public twitchUser getUser(twitchUser user)
+    public 
+    TwitchUser getUser(TwitchUser user)
     {
 
         return users.Find(x => x.name.ToLower() == user.name.ToLower());
 
     }
 
-    public bool isUserInList(twitchUser user)
+    public bool isUserInList(TwitchUser user)
     {
 
         if (users.Find(x => x.name.ToLower() == user.name.ToLower()) != null)
@@ -75,7 +76,7 @@ class twitchUsers
                 if (str != null)
                 {
                     Console.WriteLine(str);
-                    List<twitchUser>? twitchUsers = JsonSerializer.Deserialize<List<twitchUser>>(str);
+                    List<TwitchUser>? twitchUsers = JsonSerializer.Deserialize<List<TwitchUser>>(str);
                     this.users = twitchUsers;
                 }
                 sr.Close();
@@ -113,7 +114,7 @@ class twitchUsers
     public override string ToString()
     {
         string output = "";
-        foreach (twitchUser user in users)
+        foreach (TwitchUser user in users)
         {
 
             output += user.ToString() + "\n";

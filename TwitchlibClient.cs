@@ -31,7 +31,9 @@ namespace TestConsole
     {
         public TwitchClient client;
 
-        public twitchUsers users = new twitchUsers();
+        public TwitchUsers users = new TwitchUsers();
+
+        public IgnoredWords ignoredWords = new IgnoredWords();
 
         private string previousUserName = "";
 
@@ -40,6 +42,8 @@ namespace TestConsole
 
             // load all tts users
             users.load();
+            // load ignored words
+            ignoredWords.load();
 
             ConnectionCredentials credentials = new ConnectionCredentials("COHopponentBot", "oauth:6lwp9xs2oye948hx2hpv5hilldl68g");
             var clientOptions = new ClientOptions
@@ -114,7 +118,7 @@ namespace TestConsole
             string userName = e.ChatMessage.Username;
 
             //check for alias
-            twitchUser user = new twitchUser(userName);
+            TwitchUser user = new TwitchUser(userName);
             if (users.isUserInList(user))
             {
                 user = users.getUser(user);
@@ -125,7 +129,7 @@ namespace TestConsole
             if (e.ChatMessage.Message != null){
 
             // if the user exists they might be set to ignore or message starts with ! char
-            if ((!user.ignored) || (e.ChatMessage.Message[0] == "!"[0]))
+            if ((!user.ignored) || (e.ChatMessage.Message[0] == "!"[0]) || ignoredWords.containsIgnoredWord(e.ChatMessage.Message))
             {
 
                 //only use username said something, if not saying for first time in a row.
@@ -176,6 +180,13 @@ namespace TestConsole
                         case "!closetts":
                             CloseTTS();
                             break;
+                        case "!ignoreword":
+                            SetIgnoreWord(e);
+                            break;
+                        case "!unignoreword":
+                            SetUnignoreWord(e);
+                            break;
+
                         default:
                             // code block
                             break;
@@ -234,6 +245,40 @@ namespace TestConsole
 
         }
 
+        private void SetIgnoreWord(OnMessageReceivedArgs e){
+
+
+            
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 1)
+            {
+
+                ignoredWords.addWord(wordList[1]);
+                ignoredWords.save();
+
+                client.SendMessage(e.ChatMessage.Channel, String.Format("messages containing {0} will be ignored.", wordList[1]));  
+
+            }
+
+
+        }
+
+        private void SetUnignoreWord(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 1)
+            {
+
+                ignoredWords.removeWord(wordList[1]);
+                ignoredWords.save();
+
+                client.SendMessage(e.ChatMessage.Channel, String.Format("messages containing {0} will not be ignored.", wordList[1]));  
+
+            }            
+
+
+        }
+
         private void CloseTTS()
         {
 
@@ -251,7 +296,7 @@ namespace TestConsole
             if (wordList.Length > 1)
             {
                 string alias = Sanitize(wordList[1]);
-                twitchUser user = new twitchUser(e.ChatMessage.Username, alias);
+                TwitchUser user = new TwitchUser(e.ChatMessage.Username, alias);
                 if (user != null)
                 {
 
@@ -287,7 +332,7 @@ namespace TestConsole
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 1)
             {
-                twitchUser user = new twitchUser(wordList[1]);
+                TwitchUser user = new TwitchUser(wordList[1]);
                 if (user != null)
                 {
 
@@ -322,7 +367,7 @@ namespace TestConsole
             if (wordList.Length > 1)
             {
 
-                twitchUser user = new twitchUser(wordList[1]);
+                TwitchUser user = new TwitchUser(wordList[1]);
                 if (user != null)
                 {
 
