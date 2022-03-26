@@ -7,6 +7,8 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using System.Speech.Synthesis;
+using System.Text.RegularExpressions;
+
 
 namespace TestConsole
 {
@@ -16,12 +18,19 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            Bot bot = new Bot();
-            while (bot.client.IsConnected){
 
-                // runs while connected
 
+
+          Bot bot = new Bot();
+
+
+            while ((bot.isRunning) ) {
+
+                // do nothing
             }
+
+
+
         }
     }
 
@@ -30,6 +39,11 @@ namespace TestConsole
     class Bot
     {
         public TwitchClient client;
+
+        public twitchUsers users = new twitchUsers();
+        public bool isRunning = true;
+
+        private string previousUserName = "";
 	
         public Bot()
         {
@@ -75,15 +89,11 @@ namespace TestConsole
             //    client.TimeoutUser(e.ChatMessage.Channel, e.ChatMessage.Username, TimeSpan.FromMinutes(1), "Bad word! 30 minute timeout!");
 
             this.CheckForChatCommands(e);
-            
-            // Initialize a new instance of the SpeechSynthesizer.  
-            SpeechSynthesizer synth = new SpeechSynthesizer();  
 
-            // Configure the audio output.   
-            synth.SetOutputToDefaultAudioDevice();  
 
-            // Speak a string.  
-            synth.Speak(e.ChatMessage.Message);  
+            // Send to speech
+            this.Speak(e);
+
 
 
         }
@@ -102,35 +112,182 @@ namespace TestConsole
                 client.SendMessage(e.Channel, $"Welcome {e.Subscriber.DisplayName} to the substers! You just earned 500 points!");
         }
 
+    private void Speak(OnMessageReceivedArgs e){
+
+            // Initialize a new instance of the SpeechSynthesizer.  
+            SpeechSynthesizer synth = new SpeechSynthesizer();  
+
+            // Configure the audio output.   
+            synth.SetOutputToDefaultAudioDevice();  
+
+            string userName = e.ChatMessage.Username;
+
+            //check for alias
+            twitchUser user = new twitchUser(userName, "");
+            if (users.isUserInList(user)){  
+                user = users.getUser(user);
+                userName = user.alias;
+            }
+
+            //only use username said something, if not saying for first time in a row.
+            string spokenString = "";
+            if (previousUserName == userName){
+
+                spokenString = e.ChatMessage.Message;
+
+            }
+            else{
+            spokenString = userName + " said " + e.ChatMessage.Message;
+            }
+            // Speak a string.  
+            synth.Speak(spokenString);  
+
+            previousUserName = userName;
+
+    }
 
         private void CheckForChatCommands(OnMessageReceivedArgs e){
 
-            switch(e.ChatMessage.Message) 
+
+            string[] words = e.ChatMessage.Message.Split(' ');
+
+            if (words.Length > 0){
+
+
+
+            // Broadcaster Commands
+            if (e.ChatMessage.IsBroadcaster){
+            switch(words[0]) 
             {
-            case "!alias":
-                // code block
-                break;
-            case "!voice":
-                // code block
-                break;
+            
             case "!closetts":
-                closeTTS();
+                CloseTTS();
                 break;
             default:
                 // code block
                 break;
             }
- 
 
+            }
+
+            if ((e.ChatMessage.IsModerator) || (e.ChatMessage.IsBroadcaster)){
+
+            switch(words[0]) 
+            {
+            case "!alias":
+                SetAlias(e);
+                break;
+            case "!voice":
+                break;
+            case "!blacklist":
+            case "!ignorelist":
+                break;
+            case "!ignore":
+                break;
+            case "!unignore":
+                break;
+            case "!speed":
+                break;
+            case "!volume":
+                break;
+
+            
+            default:
+                // code block
+                break;
+            }
+
+
+            }
+
+
+            switch(words[0]) 
+            {
+            case "!voices":
+                // code block
+                break;
+            default:
+                // code block
+                break;
+            }
+
+            }
+
+
+
+ 
         }
 
-        private void closeTTS(){
+        private void CloseTTS(){
 
             System.Console.WriteLine("Closing TTS.");
 
             client.Disconnect();
+            this.isRunning = false;
+            Environment.Exit(0);
+            
 
         }
+
+        private void SetAlias(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 1){
+                string alias = Sanitize (wordList[1]);
+                twitchUser user = new twitchUser(e.ChatMessage.Username, alias);
+                if (user != null){
+
+                    System.Console.WriteLine("Got this far");
+                    //System.Console.WriteLine(e.ChatMessage.Username);
+                    //System.Console.WriteLine(alias);
+                    // check if user already exists
+                    System.Console.WriteLine(users.isUserInList(user).ToString());
+                    if (users.isUserInList(user)){
+
+                        user = users.getUser(user);
+                        users.removeUser(user);
+                        user.alias = alias;
+                        users.addUser(user);
+                    }
+                    else{
+
+                    System.Console.WriteLine(users.ToString());
+                    //System.Console.WriteLine(users.users.Count.ToString());
+
+                    users.addUser(user);
+
+                    System.Console.WriteLine(user.ToString());
+                    System.Console.WriteLine(users.ToString());
+                    //System.Console.WriteLine(users.users.Count.ToString());
+
+                    }
+
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("{0}'s alias has been set to {1}", e.ChatMessage.Username ,alias));
+
+                    //client.SendMessage(e.ChatMessage.Channel, "hello");
+
+                    //users.save();
+
+                }
+
+
+            }
+
+
+        }
+
+        private string Sanitize(string str){
+
+            // Allowed Characters only allowed in alias
+            string pattern = @"[^a-zA-Z0-9 -.&,%£+=?*@!#]";  
+            // Create a Regex  
+            Regex rg = new Regex(pattern);
+
+            string match = rg.Replace(str, "");
+
+            return match;
+
+        } 
 
 
 
