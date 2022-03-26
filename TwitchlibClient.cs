@@ -8,6 +8,7 @@ using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
+using System.Collections.ObjectModel;
 
 
 namespace TestConsole
@@ -129,7 +130,7 @@ namespace TestConsole
             if (e.ChatMessage.Message != null){
 
             // if the user exists they might be set to ignore or message starts with ! char
-            if ((!user.ignored) || (e.ChatMessage.Message[0] == "!"[0]) || ignoredWords.containsIgnoredWord(e.ChatMessage.Message))
+            if ((!user.ignored) && (!(e.ChatMessage.Message[0] == "!"[0])) && (!(ignoredWords.containsIgnoredWord(e.ChatMessage.Message))))
             {
 
                 //only use username said something, if not saying for first time in a row.
@@ -202,8 +203,6 @@ namespace TestConsole
                         case "!alias":
                             SetAlias(e);
                             break;
-                        case "!voice":
-                            break;
                         case "!blacklist":
                         case "!ignorelist":
                             break;
@@ -212,6 +211,11 @@ namespace TestConsole
                             break;
                         case "!unignore":
                             SetUnignore(e);
+                            break;
+                        case "!voices":
+                            DisplayAvailableVoices(e);
+                            break;
+                        case "!voice":
                             break;
                         case "!speed":
                             break;
@@ -227,7 +231,8 @@ namespace TestConsole
 
                 }
 
-
+                // extra commands for non mods
+                /*
                 switch (words[0])
                 {
                     case "!voices":
@@ -238,10 +243,43 @@ namespace TestConsole
                         break;
                 }
 
+                */
+
             }
 
 
 
+
+        }
+
+        private void DisplayAvailableVoices(OnMessageReceivedArgs e){
+
+            string voices = "";
+
+            // Initialize a new instance of the SpeechSynthesizer.  
+            SpeechSynthesizer synth = new SpeechSynthesizer();
+
+            // Configure the audio output.   
+            synth.SetOutputToDefaultAudioDevice();
+
+            ReadOnlyCollection <InstalledVoice> installedVoices  = synth.GetInstalledVoices();
+
+            int index = 0;
+            try{
+            foreach (InstalledVoice voice in installedVoices){
+
+                voices += index.ToString() + ". " + voice.VoiceInfo.Name;
+                System.Console.WriteLine(voice.VoiceInfo.Name);
+                index++;
+
+            }
+            }catch{
+
+                System.Console.WriteLine("Problem gettings installed voices.");
+            }
+
+
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Available Voices : {0}", voices.Substring(0,voices.Length))); 
 
         }
 

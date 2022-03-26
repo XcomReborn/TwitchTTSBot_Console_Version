@@ -27,11 +27,17 @@ class IgnoredWords
 
     public bool containsIgnoredWord(string message){
 
-        return ContainsAny(message, words);
+        List<string> matches = words.Where(i => message.Contains(i)).ToList();
+
+        if (matches.Count > 0){
+            return true;
+        }
+        return false;
 
     }
 
-    
+
+    // currently not using this function
     private bool ContainsAny(string s, HashSet<string> substrings)
     {
         if (string.IsNullOrEmpty(s) || substrings == null)
