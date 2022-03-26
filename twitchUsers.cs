@@ -64,7 +64,7 @@ class twitchUsers
     public void load()
     {
 
-        FileStream fs = new FileStream("test.txt", FileMode.Open, FileAccess.Read);
+        FileStream fs = new FileStream("test.json", FileMode.Open, FileAccess.Read);
         StreamReader sr = new StreamReader(fs);
         sr.BaseStream.Seek(0, SeekOrigin.Begin);
         string str = sr.ReadLine();
@@ -85,7 +85,7 @@ class twitchUsers
     public void save()
     {
 
-        FileStream fs = new FileStream("test.txt", FileMode.Create, FileAccess.Write);
+        FileStream fs = new FileStream("test.json", FileMode.Create, FileAccess.Write);
         StreamWriter sw = new StreamWriter(fs);
         string userJson = JsonSerializer.Serialize(users);
         sw.WriteLine(userJson);

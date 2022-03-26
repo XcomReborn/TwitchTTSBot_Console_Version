@@ -20,15 +20,9 @@ namespace TestConsole
         {
 
 
+        Bot bot = new Bot();
 
-          Bot bot = new Bot();
-
-
-            while ((bot.isRunning) ) {
-
-                // do nothing
-            }
-
+        System.Console.ReadLine() ;
 
 
         }
@@ -41,12 +35,15 @@ namespace TestConsole
         public TwitchClient client;
 
         public twitchUsers users = new twitchUsers();
-        public bool isRunning = true;
 
         private string previousUserName = "";
 	
         public Bot()
         {
+
+            // load all tts users
+            users.load();
+
             ConnectionCredentials credentials = new ConnectionCredentials("COHopponentBot", "oauth:6lwp9xs2oye948hx2hpv5hilldl68g");
 	    var clientOptions = new ClientOptions
                 {
@@ -223,7 +220,10 @@ namespace TestConsole
             System.Console.WriteLine("Closing TTS.");
 
             client.Disconnect();
-            this.isRunning = false;
+
+            //wait until disconnected
+            while (client.IsConnected){};
+
             Environment.Exit(0);
             
 
@@ -237,11 +237,11 @@ namespace TestConsole
                 twitchUser user = new twitchUser(e.ChatMessage.Username, alias);
                 if (user != null){
 
-                    System.Console.WriteLine("Got this far");
+                    //System.Console.WriteLine("Got this far");
                     //System.Console.WriteLine(e.ChatMessage.Username);
                     //System.Console.WriteLine(alias);
                     // check if user already exists
-                    System.Console.WriteLine(users.isUserInList(user).ToString());
+                    //System.Console.WriteLine(users.isUserInList(user).ToString());
                     if (users.isUserInList(user)){
 
                         user = users.getUser(user);
@@ -251,22 +251,20 @@ namespace TestConsole
                     }
                     else{
 
-                    System.Console.WriteLine(users.ToString());
+                    //System.Console.WriteLine(users.ToString());
                     //System.Console.WriteLine(users.users.Count.ToString());
 
                     users.addUser(user);
 
-                    System.Console.WriteLine(user.ToString());
-                    System.Console.WriteLine(users.ToString());
+                    //System.Console.WriteLine(user.ToString());
+                    //System.Console.WriteLine(users.ToString());
                     //System.Console.WriteLine(users.users.Count.ToString());
 
                     }
 
                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0}'s alias has been set to {1}", e.ChatMessage.Username ,alias));
 
-                    //client.SendMessage(e.ChatMessage.Channel, "hello");
-
-                    //users.save();
+                    users.save();
 
                 }
 
