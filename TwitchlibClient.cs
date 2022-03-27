@@ -152,6 +152,11 @@ namespace TestConsole
                 // Configure the audio output.   
                 synth.SetOutputToDefaultAudioDevice();
 
+                // Set the voice based on Name
+                if (user.voiceName != ""){
+                synth.SelectVoice(user.voiceName);
+                }
+
                 // Speak a string.  
                 synth.Speak(spokenString);
 
@@ -217,6 +222,7 @@ namespace TestConsole
                             DisplayAvailableVoices(e);
                             break;
                         case "!voice":
+                            SetVoice(e);
                             break;
                         case "!speed":
                             break;
@@ -253,6 +259,57 @@ namespace TestConsole
 
         }
 
+
+        private bool SetVoice(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 1)
+            {   
+
+                int voiceNumber = -1;
+                string voiceNumberString = wordList[1]; 
+                try{
+                    voiceNumber = int.Parse(voiceNumberString);
+                }
+                catch{
+                    System.Console.WriteLine("Problem parsing string to int in SetVoice.");
+                    return false;
+                }
+
+                // Initialize a new instance of the SpeechSynthesizer.  
+                SpeechSynthesizer synth = new SpeechSynthesizer();
+                ReadOnlyCollection <InstalledVoice> installedVoices  = synth.GetInstalledVoices();
+                if ( 0 <= voiceNumber && voiceNumber <= (installedVoices.Count - 1)){
+
+                    TwitchUser user = new TwitchUser(e.ChatMessage.Username);
+                    if (users.isUserInList(user)){
+
+                        user = users.getUser(user);
+                        users.removeUser(user);
+                        user.voiceNumber = voiceNumber;
+                        user.voiceName = installedVoices[voiceNumber].VoiceInfo.Name;
+                        users.addUser(user);
+
+                    }
+                    else{
+
+                        user.voiceNumber = voiceNumber;
+                        user.voiceName = installedVoices[voiceNumber].VoiceInfo.Name;
+                        users.addUser(user);
+                        
+                    }
+
+                    users.save();
+
+                }
+
+            }
+
+            return true;
+
+
+        }
+
         private void DisplayAvailableVoices(OnMessageReceivedArgs e){
 
             string voices = "";
@@ -269,8 +326,25 @@ namespace TestConsole
             try{
             foreach (InstalledVoice voice in installedVoices){
 
-                voices += index.ToString() + ". " + voice.VoiceInfo.Name;
-                System.Console.WriteLine(voice.VoiceInfo.Name);
+                string voiceName = voice.VoiceInfo.Name;
+                voiceName = voiceName.Replace("Microsoft ", ""); //# remove the word microsoft
+                //voiceName = voiceName.Replace(" English " , ""); //# remove the word English 
+                voiceName = voiceName.Replace("Desktop", "" ); //# remove the word Desktop
+                voiceName = voiceName.Replace("Mobile", ""); //# remove the word Mobile
+                voiceName = voiceName.Replace("-" , ""); //# remove the character "-"
+                voiceName = voiceName.Replace("(Canada)" , ""); // just removes canada for Eva if present
+                string culture = "  ";
+                try{
+                    culture = voice.VoiceInfo.Culture.Name.Substring(3, 2);
+
+                }catch{
+
+                    System.Console.WriteLine(voice.VoiceInfo.Culture.Name);
+
+                }
+
+                voices += " " + index.ToString() + ". " + voiceName + " (" + culture + ") ";
+                //System.Console.WriteLine(voice.VoiceInfo.Name);
                 index++;
 
             }

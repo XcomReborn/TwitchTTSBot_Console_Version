@@ -12,12 +12,12 @@ class TwitchUsers
         users = new List<TwitchUser>();
     }
 
-    public bool addUser(string username, string alias, int voiceNumber = 0, float voiceRate = 200)
+    public bool addUser(string username, string alias)
     {
 
         try
         {
-            users.Add(new TwitchUser(username, alias, voiceNumber, voiceRate));
+            users.Add(new TwitchUser(username, alias));
         }
         catch
         {
