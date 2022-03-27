@@ -37,6 +37,8 @@ namespace TestConsole
 
         public IgnoredWords ignoredWords = new IgnoredWords();
 
+        private SubstitutionWords substitutionWords = new SubstitutionWords();
+
         private string previousUserName = "";
 
         public Bot()
@@ -46,6 +48,8 @@ namespace TestConsole
             users.load();
             // load ignored words
             ignoredWords.load();
+            // load substitution words
+            substitutionWords.Load();
 
             ConnectionCredentials credentials = new ConnectionCredentials("COHopponentBot", "oauth:6lwp9xs2oye948hx2hpv5hilldl68g");
             var clientOptions = new ClientOptions
@@ -115,8 +119,6 @@ namespace TestConsole
         private void Speak(OnMessageReceivedArgs e)
         {
 
-
-
             string userName = e.ChatMessage.Username;
 
             //check for alias
@@ -136,15 +138,19 @@ namespace TestConsole
 
                 //only use username said something, if not saying for first time in a row.
                 string spokenString = "";
+
+                //substitute any words in the user message for the ones in the substitution dictionary.
+                string messageToTextToSpeech = SubstituteWords(e);
+
                 if (previousUserName == userName)
                 {
 
-                    spokenString = e.ChatMessage.Message;
+                    spokenString = messageToTextToSpeech;
 
                 }
                 else
                 {
-                    spokenString = userName + " said " + e.ChatMessage.Message;
+                    spokenString = userName + " said " + messageToTextToSpeech;
                 }
                 // Initialize a new instance of the SpeechSynthesizer.  
                 SpeechSynthesizer synth = new SpeechSynthesizer();
@@ -157,7 +163,7 @@ namespace TestConsole
                 synth.SelectVoice(user.voiceName);
                 }
                 // This requires testing to see if the voiceNumber index is correct.
-                synth.SelectVoiceByHints(VoiceGender.NotSet,VoiceAge.NotSet,user.voiceNumber);
+                //synth.SelectVoiceByHints(VoiceGender.NotSet,VoiceAge.NotSet,user.voiceNumber);
 
                 // Speak a string.  
                 synth.Speak(spokenString);
@@ -168,6 +174,51 @@ namespace TestConsole
             }
 
         }
+
+
+        private string SubstituteWords(OnMessageReceivedArgs e){
+
+            //check if there are any keys to substitute
+            if (substitutionWords.subwords.words.Count > 0){
+
+            string output = "";
+            try{
+
+                
+                var words = string.Join("|", substitutionWords.subwords.words.Keys);
+                System.Console.WriteLine("Word Sub Pattern Matches : " + $@"\b({words})\b");
+                // This next line replaces all the dictionary key matches with their value pairs, exclusive bound words. How does it work? No idea!
+                output = Regex.Replace(e.ChatMessage.Message, $@"\b({words})\b", delegate (Match m) { return substitutionWords.subwords.words[m.Value];  }  );
+
+                if (substitutionWords.subwords.regularexpressions.Count > 0){
+
+                     // this will iterate over regular expressions in the regular expression dictionary so care should be taken with the entered patterns.
+                    foreach (KeyValuePair<string, string> item in substitutionWords.subwords.regularexpressions){
+                        output = Regex.Replace(output, item.Key, item.Value);
+                        System.Console.WriteLine("Regex Sub Pattern Matches : " + item.Key + " : Sub : " + item.Value);
+                    }
+
+
+                }
+
+
+
+            }
+            catch (Exception exp)
+            {
+                System.Console.WriteLine(exp.ToString());
+                System.Console.WriteLine("Problems in SubstituteWords.");
+                return "";
+
+            }
+            return output;
+            
+            }else{
+            return e.ChatMessage.Message;
+            }
+        }
+
+
 
         private void CheckForChatCommands(OnMessageReceivedArgs e)
         {
@@ -213,6 +264,7 @@ namespace TestConsole
                             break;
                         case "!blacklist":
                         case "!ignorelist":
+                            DisplayBlackList(e);
                             break;
                         case "!ignore":
                             SetIgnore(e);
@@ -226,9 +278,23 @@ namespace TestConsole
                         case "!voice":
                             SetVoice(e);
                             break;
+                        case "!substitute":
+                            SetSubstituteWord(e);
+                            break;
+                        case "!removesubstitute":
+                            RemoveSubstitute(e);
+                            break;
+                        case "!regex":
+                            SetRegex(e);
+                            break;
+                        case "!removeregex":
+                            RemoveRegex(e);
+                            break;
                         case "!speed":
+                            // currently not bothering implement this
                             break;
                         case "!volume":
+                            // currently not bothering implement this
                             break;
 
 
@@ -261,6 +327,139 @@ namespace TestConsole
 
         }
 
+        private bool SetRegex(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 2){
+                // typical input in the form of !regex \b8=*D\b|\b8-*D\b wub
+                string pattern = wordList[1];
+                string wordToSubstitute = String.Join(" ", wordList.Skip(2));
+
+                substitutionWords.AddRegularExpressionSubPair(pattern, wordToSubstitute);
+                substitutionWords.Save();
+
+                client.SendMessage(e.ChatMessage.Channel, String.Format("{0} regex pattern will be substituted with {1} in text to speech.", pattern, wordToSubstitute));
+
+                return true;
+
+            }
+
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Please enter the command in the form : !regex pattern substitute"));
+            return false;
+
+        }
+
+        private bool RemoveRegex(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 1){
+                string pattern = wordList[1];
+
+                bool success = substitutionWords.RemoveRegularExpressionSubPair(pattern);
+
+                if (success){
+
+                client.SendMessage(e.ChatMessage.Channel, String.Format("{0} pattern has been removed from the word regex substitution list.", pattern));
+                return true;
+                }
+                else{
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("Could not remove {0} pattern from the regex substitution list.", pattern));
+                    return false;
+                }
+
+            }
+
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Please enter word to remove in the form of !removeregex word."));
+            return false;
+
+
+        }
+        
+        private bool RemoveSubstitute(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 1){
+                string wordToRemove = wordList[1];
+
+
+                bool success = substitutionWords.RemoveWord(wordToRemove);
+
+                if (success){
+
+                client.SendMessage(e.ChatMessage.Channel, String.Format("{0} has been removed from the word substitution list.", wordToRemove));
+                return true;
+                }
+                else{
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("Could not remove {0} from the word substitution list.", wordToRemove));
+                    return false;
+                }
+
+            }
+
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Please enter word to remove in the form of !removesubstitute word."));
+            return false;
+
+        }
+
+        private bool SetSubstituteWord(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 2){
+                // typical input in the form of !substitute <3 wub
+                string word = wordList[1];
+                System.Console.WriteLine(String.Format("word : {0}", word));
+                string wordToSubstitute = String.Join(" ", wordList.Skip(2));
+
+                substitutionWords.AddWordPair(word, wordToSubstitute);
+                substitutionWords.Save();
+
+                client.SendMessage(e.ChatMessage.Channel, String.Format("{0} will be substituted with {1} in text to speech.", word, wordToSubstitute));
+
+                return true;
+
+            }
+
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Please enter the command in the form : !substitute word substitute"));
+            return false;
+
+        }
+
+
+        private bool DisplayBlackList(OnMessageReceivedArgs e){
+
+
+            
+
+            List<TwitchUser> ignoredList = new List<TwitchUser>();
+
+            // get only users where ignore is true and put into new list
+
+            foreach (TwitchUser user in users.users){
+
+                if (user.ignored == true){
+
+                    ignoredList.Add(user);
+                }
+
+            }
+
+            List<string> names = new List<string>();
+
+            foreach (TwitchUser user in ignoredList){
+
+                names.Add(user.name);
+
+            }
+
+            string output = "";
+            output = String.Join(",", names);
+
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Ignored Users : {0}.", output));
+
+            return true;
+
+
+        }
 
         private bool SetVoice(OnMessageReceivedArgs e){
 
@@ -301,6 +500,8 @@ namespace TestConsole
                         users.addUser(user);
                         
                     }
+
+                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0} has selected voice : {1}", user.name, user.voiceName));
 
                     users.save();
 
@@ -352,7 +553,7 @@ namespace TestConsole
 
             }
             }catch{
-
+                
                 System.Console.WriteLine("Problem gettings installed voices.");
             }
 
@@ -535,3 +736,4 @@ namespace TestConsole
 
     }
 }
+

@@ -20,7 +20,7 @@ In Command Pallet (Ctrl+Shift+P)
 open NuGet Gallery
 search for and install TwitchLib 3.3.0
 search for and install System.Speech 6.0.0
-
+search for and install NewtonSoft.Json 13.0.1
 
 The bot commands are restricted to twitch channel moderators and are as follows:
 
