@@ -3,3 +3,5 @@ obj
 workspace.code-workspace
 data.json
 .vscode
+ignoredWords.json
+ignoredWords.json

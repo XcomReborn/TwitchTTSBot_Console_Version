@@ -9,6 +9,7 @@ using TwitchLib.Communication.Models;
 using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 
 namespace TestConsole
@@ -179,7 +180,7 @@ namespace TestConsole
                     {
 
                         case "!closetts":
-                            CloseTTS();
+                            CloseTTS(e);
                             break;
                         case "!ignoreword":
                             SetIgnoreWord(e);
@@ -317,10 +318,11 @@ namespace TestConsole
 
         }
 
-        private void CloseTTS()
+        private void CloseTTS(OnMessageReceivedArgs e)
         {
 
             System.Console.WriteLine("Closing TTS.");
+            client.SendMessage(e.ChatMessage.Channel, "Closing TTS Bot.");
 
             // BruteForce the Exit
             Environment.Exit(0);
@@ -333,7 +335,8 @@ namespace TestConsole
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 1)
             {
-                string alias = Sanitize(wordList[1]);
+
+                string alias = Sanitize(String.Join(" ", wordList.Skip(1)));
                 TwitchUser user = new TwitchUser(e.ChatMessage.Username, alias);
                 if (user != null)
                 {
