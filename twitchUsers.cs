@@ -12,12 +12,12 @@ class TwitchUsers
         users = new List<TwitchUser>();
     }
 
-    public bool addUser(string username, string alias)
+    public bool AddUser(string username, string alias)
     {
 
         try
         {
-            users.Add(new TwitchUser(username, alias));
+            users.Add(new TwitchUser(username.ToLower(), alias));
         }
         catch
         {
@@ -26,17 +26,18 @@ class TwitchUsers
         return true;
     }
 
-    public bool addUser(TwitchUser user)
+    public bool AddUser(TwitchUser user)
     {
         try
         {
+            user.name.ToLower();
             users.Add(user);
         }
         catch { return true; }
         return true;
     }
 
-    public bool removeUser(TwitchUser user)
+    public bool RemoveUser(TwitchUser user)
     {
 
         return users.Remove(user);
@@ -44,14 +45,20 @@ class TwitchUsers
     }
 
     public 
-    TwitchUser getUser(TwitchUser user)
+    TwitchUser GetUser(TwitchUser user)
     {
 
         return users.Find(x => x.name.ToLower() == user.name.ToLower());
 
     }
 
-    public bool isUserInList(TwitchUser user)
+    TwitchUser GetUser(string userName){
+
+        return users.Find(x => x.name.ToLower() == userName.ToLower());
+
+    }
+
+    public bool IsUserInList(TwitchUser user)
     {
 
         if (users.Find(x => x.name.ToLower() == user.name.ToLower()) != null)
@@ -61,8 +68,20 @@ class TwitchUsers
         return false;
     }
 
+      public bool IsUserInList(string userName)
+    {
 
-    public bool load()
+        if (users.Find(x => x.name.ToLower() == userName.ToLower()) != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+      
+
+
+    public bool Load()
     {
         if (File.Exists("data.json"))
         {
@@ -93,7 +112,7 @@ class TwitchUsers
 
     }
 
-    public bool save()
+    public bool Save()
     {
         try{
         FileStream fs = new FileStream("data.json", FileMode.Create, FileAccess.Write);

@@ -27,7 +27,8 @@ The bot commands are restricted to twitch channel moderators and are as follows:
 !voices - lists all available voices
 !voice # [optional userName]- sets the users voice to an available voice listed in !voices or sets the voice of an another user to that voice
 
-!alias [alias] [optional userName] - sets the users alias or sets the alias of another user
+!alias [alias] [optional userName] - sets mod username alias
+!useralias [username] [alias] - sets another users alias
 
 !ignore [] - ignores the following user name
 !unignore [] - unignores the following user name

@@ -45,7 +45,7 @@ namespace TestConsole
         {
 
             // load all tts users
-            users.load();
+            users.Load();
             // load ignored words
             ignoredWords.load();
             // load substitution words
@@ -123,9 +123,9 @@ namespace TestConsole
 
             //check for alias
             TwitchUser user = new TwitchUser(userName);
-            if (users.isUserInList(user))
+            if (users.IsUserInList(user))
             {
-                user = users.getUser(user);
+                user = users.GetUser(user);
                 userName = user.alias;
             }
 
@@ -188,7 +188,7 @@ namespace TestConsole
                 var words = string.Join("|", substitutionWords.subwords.words.Keys);
                 System.Console.WriteLine("Word Sub Pattern Matches : " + $@"\b({words})\b");
                 // This next line replaces all the dictionary key matches with their value pairs, exclusive bound words. How does it work? No idea!
-                output = Regex.Replace(e.ChatMessage.Message, $@"\b({words})\b", delegate (Match m) { return substitutionWords.subwords.words[m.Value];  }  );
+                output = Regex.Replace(e.ChatMessage.Message, $@"\b({words})\b", delegate (Match m) { return substitutionWords.subwords.words[Regex.Escape(m.Value)];  }  );
 
                 if (substitutionWords.subwords.regularexpressions.Count > 0){
 
@@ -262,6 +262,10 @@ namespace TestConsole
                         case "!alias":
                             SetAlias(e);
                             break;
+                        case "!useralias":
+                            SetUserAlias(e);
+                            break;
+
                         case "!blacklist":
                         case "!ignorelist":
                             DisplayBlackList(e);
@@ -360,6 +364,7 @@ namespace TestConsole
                 if (success){
 
                 client.SendMessage(e.ChatMessage.Channel, String.Format("{0} pattern has been removed from the word regex substitution list.", pattern));
+                substitutionWords.Save();
                 return true;
                 }
                 else{
@@ -387,6 +392,7 @@ namespace TestConsole
                 if (success){
 
                 client.SendMessage(e.ChatMessage.Channel, String.Format("{0} has been removed from the word substitution list.", wordToRemove));
+                substitutionWords.Save();
                 return true;
                 }
                 else{
@@ -484,26 +490,26 @@ namespace TestConsole
                 if ( 0 <= voiceNumber && voiceNumber <= (installedVoices.Count - 1)){
 
                     TwitchUser user = new TwitchUser(e.ChatMessage.Username);
-                    if (users.isUserInList(user)){
+                    if (users.IsUserInList(user)){
 
-                        user = users.getUser(user);
-                        users.removeUser(user);
+                        user = users.GetUser(user);
+                        users.RemoveUser(user);
                         user.voiceNumber = voiceNumber;
                         user.voiceName = installedVoices[voiceNumber].VoiceInfo.Name;
-                        users.addUser(user);
+                        users.AddUser(user);
 
                     }
                     else{
 
                         user.voiceNumber = voiceNumber;
                         user.voiceName = installedVoices[voiceNumber].VoiceInfo.Name;
-                        users.addUser(user);
+                        users.AddUser(user);
                         
                     }
 
                      client.SendMessage(e.ChatMessage.Channel, String.Format("{0} has selected voice : {1}", user.name, user.voiceName));
 
-                    users.save();
+                    users.Save();
 
                 }
 
@@ -619,30 +625,69 @@ namespace TestConsole
                 if (user != null)
                 {
 
-                    if (users.isUserInList(user))
+                    if (users.IsUserInList(user))
                     {
 
-                        user = users.getUser(user);
-                        users.removeUser(user);
+                        user = users.GetUser(user);
+                        users.RemoveUser(user);
                         user.alias = alias;
-                        users.addUser(user);
+                        users.AddUser(user);
                     }
                     else
                     {
 
-                        users.addUser(user);
+                        users.AddUser(user);
 
                     }
 
                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0}'s alias has been set to {1}", e.ChatMessage.Username, alias));
 
-                    users.save();
+                    users.Save();
 
                 }
 
 
             }
 
+
+        }
+
+        private void SetUserAlias(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 2)
+            {
+                string userName = wordList[1];
+                string alias = Sanitize(String.Join(" ", wordList.Skip(2)));
+                TwitchUser user = new TwitchUser(userName, alias);
+                if (user != null)
+                {
+
+                    if (users.IsUserInList(user))
+                    {
+
+                        user = users.GetUser(user);
+                        users.RemoveUser(user);
+                        user.alias = alias;
+                        users.AddUser(user);
+                    }
+                    else
+                    {
+
+                        users.AddUser(user);
+
+                    }
+
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("{0}'s alias has been set to {1}", userName, alias));
+
+                    users.Save();
+
+                }
+
+
+            }
+
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Correct usage in the form !useralias userName alias"));
 
         }
 
@@ -655,24 +700,24 @@ namespace TestConsole
                 if (user != null)
                 {
 
-                    if (users.isUserInList(user))
+                    if (users.IsUserInList(user))
                     {
 
-                        user = users.getUser(user);
-                        users.removeUser(user);
+                        user = users.GetUser(user);
+                        users.RemoveUser(user);
                         user.ignored = true;
-                        users.addUser(user);
+                        users.AddUser(user);
                     }
                     else
                     {
 
                         user.ignored = true;
-                        users.addUser(user);
+                        users.AddUser(user);
 
                     }
 
                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0} will be ignored.", user.name));
-                    users.save();
+                    users.Save();
 
                 }
 
@@ -690,24 +735,24 @@ namespace TestConsole
                 if (user != null)
                 {
 
-                    if (users.isUserInList(user))
+                    if (users.IsUserInList(user))
                     {
 
-                        user = users.getUser(user);
-                        users.removeUser(user);
+                        user = users.GetUser(user);
+                        users.RemoveUser(user);
                         user.ignored = false;
-                        users.addUser(user);
+                        users.AddUser(user);
                     }
                     else
                     {
 
                         user.ignored = false;
-                        users.addUser(user);
+                        users.AddUser(user);
 
                     }
 
                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0} will not be ignored.", user.name));
-                    users.save();
+                    users.Save();
 
                 }
 
