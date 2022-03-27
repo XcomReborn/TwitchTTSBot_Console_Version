@@ -156,6 +156,8 @@ namespace TestConsole
                 if (user.voiceName != ""){
                 synth.SelectVoice(user.voiceName);
                 }
+                // This requires testing to see if the voiceNumber index is correct.
+                synth.SelectVoiceByHints(VoiceGender.NotSet,VoiceAge.NotSet,user.voiceNumber);
 
                 // Speak a string.  
                 synth.Speak(spokenString);
@@ -272,6 +274,7 @@ namespace TestConsole
                     voiceNumber = int.Parse(voiceNumberString);
                 }
                 catch{
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("{0} is not a vaild voice number.", voiceNumberString));
                     System.Console.WriteLine("Problem parsing string to int in SetVoice.");
                     return false;
                 }
@@ -339,7 +342,7 @@ namespace TestConsole
 
                 }catch{
 
-                    System.Console.WriteLine(voice.VoiceInfo.Culture.Name);
+                    System.Console.WriteLine("Problem getting last two characters of : " + voice.VoiceInfo.Culture.Name);
 
                 }
 
@@ -354,7 +357,7 @@ namespace TestConsole
             }
 
 
-            client.SendMessage(e.ChatMessage.Channel, String.Format("Available Voices : {0}", voices.Substring(0,voices.Length))); 
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Available Voices : {0}", voices.Substring(0, Math.Min(voices.Length, 500)))); 
 
         }
 
