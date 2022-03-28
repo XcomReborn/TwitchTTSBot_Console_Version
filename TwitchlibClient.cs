@@ -47,7 +47,7 @@ namespace TestConsole
             // load all tts users
             users.Load();
             // load ignored words
-            ignoredWords.load();
+            ignoredWords.Load();
             // load substitution words
             substitutionWords.Load();
 
@@ -133,7 +133,7 @@ namespace TestConsole
             if (e.ChatMessage.Message != null){
 
             // if the user exists they might be set to ignore or message starts with ! char
-            if ((!user.ignored) && (!(e.ChatMessage.Message[0] == "!"[0])) && (!(ignoredWords.containsIgnoredWord(e.ChatMessage.Message))))
+            if ((!user.ignored) && (!(e.ChatMessage.Message[0] == "!"[0])) && (!(ignoredWords.ContainsIgnoredWord(e.ChatMessage.Message))))
             {
 
                 //only use username said something, if not saying for first time in a row.
@@ -281,6 +281,9 @@ namespace TestConsole
                             break;
                         case "!voice":
                             SetVoice(e);
+                            break;
+                        case "!uservoice":
+                            SetUserVoice(e);
                             break;
                         case "!substitute":
                             SetSubstituteWord(e);
@@ -520,6 +523,62 @@ namespace TestConsole
 
         }
 
+        private bool SetUserVoice(OnMessageReceivedArgs e){
+
+            string[] wordList = e.ChatMessage.Message.Split(' ');
+            if (wordList.Length > 2)
+            {   
+
+                int voiceNumber = -1;
+                string userName = wordList[1];
+                string voiceNumberString = wordList[2]; 
+                try{
+                    voiceNumber = int.Parse(voiceNumberString);
+                }
+                catch{
+                    client.SendMessage(e.ChatMessage.Channel, String.Format("{0} is not a vaild voice number.", voiceNumberString));
+                    System.Console.WriteLine("Problem parsing string to int in SetVoice.");
+                    return false;
+                }
+
+                // Initialize a new instance of the SpeechSynthesizer.  
+                SpeechSynthesizer synth = new SpeechSynthesizer();
+                ReadOnlyCollection <InstalledVoice> installedVoices  = synth.GetInstalledVoices();
+                if ( 0 <= voiceNumber && voiceNumber <= (installedVoices.Count - 1)){
+
+                    TwitchUser user = new TwitchUser(userName);
+                    if (users.IsUserInList(user)){
+
+                        user = users.GetUser(user);
+                        users.RemoveUser(user);
+                        user.voiceNumber = voiceNumber;
+                        user.voiceName = installedVoices[voiceNumber].VoiceInfo.Name;
+                        users.AddUser(user);
+
+                    }
+                    else{
+
+                        user.voiceNumber = voiceNumber;
+                        user.voiceName = installedVoices[voiceNumber].VoiceInfo.Name;
+                        users.AddUser(user);
+                        
+                    }
+
+                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0} voice has been set to voice : {1}", user.name, user.voiceName));
+
+                    users.Save();
+
+                }
+
+            }
+
+            client.SendMessage(e.ChatMessage.Channel, String.Format("Correct useage in the form of !uservoice [UserName] [VoiceNumber]"));
+
+            return true;
+
+
+        }
+
         private void DisplayAvailableVoices(OnMessageReceivedArgs e){
 
             string voices = "";
@@ -576,8 +635,8 @@ namespace TestConsole
             if (wordList.Length > 1)
             {
 
-                ignoredWords.addWord(wordList[1]);
-                ignoredWords.save();
+                ignoredWords.AddWord(wordList[1]);
+                ignoredWords.Save();
 
                 client.SendMessage(e.ChatMessage.Channel, String.Format("messages containing {0} will be ignored.", wordList[1]));  
 
@@ -592,8 +651,8 @@ namespace TestConsole
             if (wordList.Length > 1)
             {
 
-                ignoredWords.removeWord(wordList[1]);
-                ignoredWords.save();
+                ignoredWords.RemoveWord(wordList[1]);
+                ignoredWords.Save();
 
                 client.SendMessage(e.ChatMessage.Channel, String.Format("messages containing {0} will not be ignored.", wordList[1]));  
 

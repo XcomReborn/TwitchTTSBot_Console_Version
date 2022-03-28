@@ -15,17 +15,17 @@ class IgnoredWords
 
     }
 
-    public bool addWord(string word)
+    public bool AddWord(string word)
     {
         return words.Add(word);
     }
 
-    public bool removeWord(string word)
+    public bool RemoveWord(string word)
     {
         return words.Remove(word);
     }
 
-    public bool containsIgnoredWord(string message){
+    public bool ContainsIgnoredWord(string message){
 
         List<string> matches = words.Where(i => message.Contains(i)).ToList();
 
@@ -45,7 +45,7 @@ class IgnoredWords
         return substrings.Any(substring => s.Contains(substring, StringComparison.CurrentCultureIgnoreCase));
     }
 
-    public bool load()
+    public bool Load()
     {
 
         if (File.Exists("ignoredWords.json"))
@@ -77,7 +77,7 @@ class IgnoredWords
 
     }
 
-    public bool save()
+    public bool Save()
 
     {
         try
