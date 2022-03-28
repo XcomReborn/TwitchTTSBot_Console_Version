@@ -19,8 +19,8 @@
 
 ### Bot commands for Streamer/AdminUserName:
 
-**!ignoreword** [word] - will mute a message containing a specific word eg: http or www.
-**!unignoreword** [word] - will remove the word from the ignore word list.
+**!ignoreword** [word] - will mute a message containing a specific word eg: http or www.  
+**!unignoreword** [word] - will remove the word from the ignore word list.  
 
 ### Bot commands restricted to twitch channel moderators:
 
