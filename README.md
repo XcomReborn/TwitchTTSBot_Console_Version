@@ -21,6 +21,7 @@
 
 **!ignoreword** [word] - will mute a message containing a specific word eg: http or www.  
 **!unignoreword** [word] - will remove the word from the ignore word list.  
+**!closetts** - will close the program.  
 
 ### Bot commands restricted to twitch channel moderators:
 
