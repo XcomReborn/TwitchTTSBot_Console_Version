@@ -27,7 +27,7 @@ class SubstitutionWords{
 
     public bool AddWordPair(string word, string wordToSubstitute){
         
-        subwords.words.Add(Regex.Escape(word), wordToSubstitute);
+        subwords.words.Add(Regex.Escape(word), wordToSubstitute.Split(",").ToList());
         return true;
     }
 
@@ -39,7 +39,7 @@ class SubstitutionWords{
 
     public bool AddRegularExpressionSubPair(string pattern, string wordToSubstitute){
 
-        subwords.regularexpressions.Add(pattern, wordToSubstitute);
+        subwords.regularexpressions.Add(pattern, wordToSubstitute.Split(",").ToList());
         return true;
     }
 
@@ -118,13 +118,12 @@ class SubstitutionWords{
 [System.Serializable]
 class SubWords{
 
-    public Dictionary<string, string> words;
-    public Dictionary<string, string> regularexpressions; 
+    public Dictionary<string, List<string>> words = new Dictionary<string, List<string>>();
+    public Dictionary<string, List<string>> regularexpressions = new Dictionary<string, List<string>>(); 
 
     public SubWords(){
 
-        words = new Dictionary<string, string>();
-        regularexpressions = new Dictionary<string, string>();
+        // No Construction Required
 
     }
 

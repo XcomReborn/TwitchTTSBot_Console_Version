@@ -189,13 +189,19 @@ namespace TestConsole
                 var words = string.Join("|", substitutionWords.subwords.words.Keys);
                 System.Console.WriteLine("Word Sub Pattern Matches : " + $@"\b({words})\b");
                 // This next line replaces all the dictionary key matches with their value pairs, exclusive bound words. How does it work? No idea!
-                output = Regex.Replace(e.ChatMessage.Message, $@"\b({words})\b", delegate (Match m) { return substitutionWords.subwords.words[Regex.Escape(m.Value)];  }  );
+
+                output = Regex.Replace(e.ChatMessage.Message, $@"\b({words})\b", delegate (Match m) 
+                { 
+
+                    return substitutionWords.subwords.words[Regex.Escape(m.Value)].PickRandom();  }  
+                
+                );
 
                 if (substitutionWords.subwords.regularexpressions.Count > 0){
 
                      // this will iterate over regular expressions in the regular expression dictionary so care should be taken with the entered patterns.
-                    foreach (KeyValuePair<string, string> item in substitutionWords.subwords.regularexpressions){
-                        output = Regex.Replace(output, item.Key, item.Value);
+                    foreach (KeyValuePair<string, List<string>> item in substitutionWords.subwords.regularexpressions){
+                        output = Regex.Replace(output, item.Key, item.Value.PickRandom());
                         System.Console.WriteLine("Regex Sub Pattern Matches : " + item.Key + " : Sub : " + item.Value);
                     }
 
@@ -840,6 +846,24 @@ namespace TestConsole
 
 
 
+    }
+}
+
+public static class EnumerableExtension
+{
+    public static T PickRandom<T>(this IEnumerable<T> source)
+    {
+        return source.PickRandom(1).Single();
+    }
+
+    public static IEnumerable<T> PickRandom<T>(this IEnumerable<T> source, int count)
+    {
+        return source.Shuffle().Take(count);
+    }
+
+    public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
+    {
+        return source.OrderBy(x => Guid.NewGuid());
     }
 }
 
