@@ -1,4 +1,4 @@
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Linq;
 
 class IgnoredWords
@@ -6,7 +6,7 @@ class IgnoredWords
     
     private HashSet<string> words = new HashSet<string>();
 
-    private string ignoredWordsPath = "data/ignoredWords.json";
+    private string ignoredWordsPath = AppDomain.CurrentDomain.BaseDirectory + "/data/ignoredWords.json";
 
 
     public IgnoredWords()
@@ -17,7 +17,6 @@ class IgnoredWords
         if (!Load())
         {
 
-            words = new HashSet<string>();
             Save();
 
         }       
@@ -69,7 +68,7 @@ class IgnoredWords
                 if (str != null)
                 {
                     Console.WriteLine(str);
-                    HashSet<string>? wordList = JsonSerializer.Deserialize<HashSet<string>>(str);
+                    HashSet<string>? wordList = JsonConvert.DeserializeObject<HashSet<string>>(str);
                     this.words = wordList;
                 }
                 sr.Close();
@@ -89,11 +88,23 @@ class IgnoredWords
     public bool Save()
 
     {
+
+
+        try{
+            if (!File.Exists(ignoredWordsPath)){
+            Directory.CreateDirectory(Path.GetDirectoryName(ignoredWordsPath));
+            }
+        }
+        catch{
+
+            System.Console.WriteLine("A problem occurred while trying to create the ignoredWordsPath Directory.");
+        }
+
         try
         {
             FileStream fs = new FileStream(ignoredWordsPath, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs);
-            string userJson = JsonSerializer.Serialize(words);
+            string userJson = JsonConvert.SerializeObject(words);
             sw.WriteLine(userJson);
             sw.Flush();
             sw.Close();

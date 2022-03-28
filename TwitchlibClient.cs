@@ -33,27 +33,20 @@ namespace TestConsole
     {
         public TwitchClient client;
 
+        private TwitchTTSBotSettingsManager botSettingManager = new TwitchTTSBotSettingsManager();
+
         public TwitchUsers users = new TwitchUsers();
 
-        public IgnoredWords ignoredWords = new IgnoredWords();
+        private IgnoredWords ignoredWords = new IgnoredWords();
 
         private SubstitutionWords substitutionWords = new SubstitutionWords();
 
-        private TwitchTTSBotSettingsManager botSettingManager = new TwitchTTSBotSettingsManager();
+        
 
         private string previousUserName = "";
 
         public Bot()
         {
-
-            // load all tts users
-            //users.Load();
-            // load ignored words
-            //ignoredWords.Load();
-            // load substitution words
-            //substitutionWords.Load();
-            // load user settings
-            //botSettingManager.Load();
 
 
             ConnectionCredentials credentials = new ConnectionCredentials(botSettingManager.settings.botName, botSettingManager.settings.botOAuthKey);
@@ -711,6 +704,8 @@ namespace TestConsole
 
                     users.Save();
 
+                    return;
+
                 }
 
 
@@ -748,6 +743,8 @@ namespace TestConsole
                     client.SendMessage(e.ChatMessage.Channel, String.Format("{0}'s alias has been set to {1}", userName, alias));
 
                     users.Save();
+
+                    return;
 
                 }
 

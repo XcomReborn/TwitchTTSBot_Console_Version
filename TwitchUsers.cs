@@ -7,7 +7,7 @@ class TwitchUsers
 
     public List<TwitchUser> users { get; set; } = new List<TwitchUser>();
 
-    public string dataPath = "data/twitchUserData.json";
+    public string dataPath = AppDomain.CurrentDomain.BaseDirectory + "/data/twitchUserData.json";
 
     public TwitchUsers()
     {
@@ -16,7 +16,6 @@ class TwitchUsers
         if (!Load())
         {
 
-            users = new List<TwitchUser>();
             Save();
 
         }
@@ -125,6 +124,16 @@ class TwitchUsers
 
     public bool Save()
     {
+
+        try{
+            if (!File.Exists(dataPath)){
+            Directory.CreateDirectory(Path.GetDirectoryName(dataPath));
+            }
+        }
+        catch{
+
+            System.Console.WriteLine("A problem occurred while trying to create the dataPath Directory.");
+        }
         try{
         FileStream fs = new FileStream(dataPath, FileMode.Create, FileAccess.Write);
         StreamWriter sw = new StreamWriter(fs);
@@ -135,7 +144,7 @@ class TwitchUsers
         fs.Close();
         }
         catch{
-            System.Console.WriteLine("A problem occurred while trying to save twitchUsers");
+            System.Console.WriteLine("A problem occurred while trying to save twitchUsers.");
             return false;
         }
         return true;

@@ -7,18 +7,17 @@ class SubstitutionWords{
 
     public SubWords subwords = new SubWords();
 
-    public string substitutionWordsPath = "data/substitutionWords.json";
+    public string substitutionWordsPath = AppDomain.CurrentDomain.BaseDirectory + "/data/substitutionWords.json";
 
 
     public SubstitutionWords(){
 
         // attempt to load settings if fails use defaults
 
-        if (!Load())
+        if (!this.Load())
         {
 
-            subwords = new SubWords();
-            Save();
+            this.Save();
 
         }
         
@@ -51,12 +50,24 @@ class SubstitutionWords{
     }
 
 
-    public bool Save(){
+    public bool Save()
+    {
+
+        try{
+            if (!File.Exists(substitutionWordsPath)){
+            Directory.CreateDirectory(Path.GetDirectoryName(substitutionWordsPath));
+            }
+        }
+        catch{
+
+            System.Console.WriteLine("A problem occurred while trying to create the substitutionWordsPath Directory.");
+        }
+
+
         try
         {
             FileStream fs = new FileStream(substitutionWordsPath, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs);
-            //string userJson = JsonSerializer.Serialize(subwords);
             string userJson = JsonConvert.SerializeObject(subwords);
             sw.WriteLine(userJson);
             sw.Flush();
@@ -72,7 +83,8 @@ class SubstitutionWords{
         return true;
     }
 
-    public bool Load(){
+    public bool Load()
+    {
 
        if (File.Exists(substitutionWordsPath))
         {
@@ -85,8 +97,7 @@ class SubstitutionWords{
                 string str = sr.ReadToEnd();
                 if (str != null)
                 {
-                    //Console.WriteLine(str);
-                    //SubWords? wordDictionary = JsonSerializer.Deserialize<SubWords>(str);
+
                     SubWords? wordDictionary = JsonConvert.DeserializeObject<SubWords>(str);
                     this.subwords = wordDictionary;
                 }
@@ -99,10 +110,12 @@ class SubstitutionWords{
                 return false;
             }
         }
+        else{
+            return false;
+        }
 
     
         return true;
-
 
     }
 

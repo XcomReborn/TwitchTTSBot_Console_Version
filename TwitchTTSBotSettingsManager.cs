@@ -8,7 +8,7 @@ class TwitchTTSBotSettingsManager
 
     public TwitchTTSBotSettings settings = new TwitchTTSBotSettings();
 
-    public string userSettingsPath = "data/userSettings.json";
+    public string userSettingsPath =  AppDomain.CurrentDomain.BaseDirectory + "/data/userSettings.json";
 
     public TwitchTTSBotSettingsManager()
     {
@@ -18,7 +18,6 @@ class TwitchTTSBotSettingsManager
         if (!Load())
         {
 
-            settings = new TwitchTTSBotSettings();
             Save();
 
         }
@@ -64,7 +63,17 @@ class TwitchTTSBotSettingsManager
     public bool Save()
     {
 
-        {
+        try{
+            if (!File.Exists(userSettingsPath)){
+            Directory.CreateDirectory(Path.GetDirectoryName(userSettingsPath));
+            }
+        }
+        catch{
+
+            System.Console.WriteLine("A problem occurred while trying to create the userSettingsPath Directory.");
+        }
+
+
             try
             {
                 FileStream fs = new FileStream(userSettingsPath, FileMode.Create, FileAccess.Write);
@@ -75,13 +84,14 @@ class TwitchTTSBotSettingsManager
                 sw.Close();
                 fs.Close();
             }
-            catch
+            catch (Exception exception)
             {
+                System.Console.WriteLine(exception.ToString());
                 System.Console.WriteLine("A problem occurred while trying to save userSettings.");
                 return false;
             }
             return true;
-        }
+
     }
 
 
