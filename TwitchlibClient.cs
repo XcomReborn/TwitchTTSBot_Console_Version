@@ -39,6 +39,8 @@ namespace TestConsole
 
         private SubstitutionWords substitutionWords = new SubstitutionWords();
 
+        private TwitchTTSBotSettingsManager botSettingManager = new TwitchTTSBotSettingsManager();
+
         private string previousUserName = "";
 
         public Bot()
@@ -50,8 +52,11 @@ namespace TestConsole
             ignoredWords.Load();
             // load substitution words
             substitutionWords.Load();
+            // load user settings
+            botSettingManager.Load();
 
-            ConnectionCredentials credentials = new ConnectionCredentials("COHopponentBot", "oauth:6lwp9xs2oye948hx2hpv5hilldl68g");
+
+            ConnectionCredentials credentials = new ConnectionCredentials(botSettingManager.settings.botName, botSettingManager.settings.botOAuthKey);
             var clientOptions = new ClientOptions
             {
                 MessagesAllowedInPeriod = 750,
@@ -59,7 +64,7 @@ namespace TestConsole
             };
             WebSocketClient customClient = new WebSocketClient(clientOptions);
             client = new TwitchClient(customClient);
-            client.Initialize(credentials, "xcomreborn");
+            client.Initialize(credentials, botSettingManager.settings.defaultJoinChannel);
 
             client.OnLog += Client_OnLog;
             client.OnJoinedChannel += Client_OnJoinedChannel;
@@ -83,22 +88,18 @@ namespace TestConsole
 
         private void Client_OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            Console.WriteLine("Hey guys! I am a bot connected via TwitchLib!");
-            client.SendMessage(e.Channel, "Hey guys! I am a bot connected via TwitchLib!");
+            Console.WriteLine("Text To Speech Bot Has Connected to This Channel!");
+            client.SendMessage(e.Channel, "Text To Speech Bot Has Connected to This Channel!");
         }
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            //if (e.ChatMessage.Message.Contains("badword"))
-            //    client.TimeoutUser(e.ChatMessage.Channel, e.ChatMessage.Username, TimeSpan.FromMinutes(1), "Bad word! 30 minute timeout!");
 
+            // check for any text to speech chat commands 
             this.CheckForChatCommands(e);
-
 
             // Send to speech
             this.Speak(e);
-
-
 
         }
 
@@ -230,9 +231,8 @@ namespace TestConsole
             {
 
 
-
                 // Broadcaster Commands
-                if (e.ChatMessage.IsBroadcaster)
+                if ((e.ChatMessage.IsBroadcaster) || (this.botSettingManager.settings.botAdminUserName.ToLower() == e.ChatMessage.Username))
                 {
                     switch (words[0])
                     {
@@ -254,7 +254,9 @@ namespace TestConsole
 
                 }
 
-                if ((e.ChatMessage.IsModerator) || (e.ChatMessage.IsBroadcaster))
+
+                // Moderator commands 
+                if ((e.ChatMessage.IsModerator) || (e.ChatMessage.IsBroadcaster) || (this.botSettingManager.settings.botAdminUserName.ToLower() == e.ChatMessage.Username))
                 {
 
                     switch (words[0])
