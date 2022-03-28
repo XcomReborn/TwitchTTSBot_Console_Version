@@ -1,4 +1,22 @@
 # CSharpTwitchTTSBot
+
+Downloadable Executable for Windows 10 in Releases:
+
+User Instructions for Windows:
+
+1. Download Release 
+2. Unzip to folder (You can do this with winrar or similar application).
+3. Inside the folder you will find a file called "CSharpTwitchTTSBot.exe" and a folder called "data"
+4. Inside the "data" folder you will find a file called "userSettings.json"
+5. Modify the defaultJoinChannel and botAdminUserName values using a text editor like notepad (the current values for each are "xcomreborn").
+6. Run the program by double clicking the CSharpTwitchTTSBot.exe icon.
+
+-- A console window should appear in the background. 
+-- To close the program, you can either press return with that window in focus OR type !closetts in the twitch chat channel you selected OR by closing the console window with the close icon.
+
+
+
+Compilation Instructions.
  
  A simple bot that uses the twitchlib library and System.Speech.Synthesis windows SAPI5 to speak text written in twitch IRC Chat
 
