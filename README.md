@@ -24,16 +24,16 @@
 
 ### Bot commands restricted to twitch channel moderators:
 
-**!voices** - lists all available voices  
+**!voices** - lists all available voices.  
 **!voice #** - sets the users voice to an available voice listed in !voices.  
 **!uservoice** [userName] # - sets the userName's voice to an available voice listed in !voices.  
 
-**!alias** [alias] [optional userName] - sets mod username alias  
-**!useralias** [userName] [alias] - sets another users alias  
+**!alias** [alias] [optional userName] - sets mod username alias.  
+**!useralias** [userName] [alias] - sets another users alias.  
 
-**!ignore [userName]** - ignores the following user name  
-**!unignore [userName]** - unignores the following user name  
-**!blacklist** - lists all the usernames in the blacklist (!ignorelist)  
+**!ignore [userName]** - ignores the following user name.  
+**!unignore [userName]** - unignores the following user name.  
+**!blacklist** - lists all the usernames in the blacklist (!ignorelist).  
 
 **!substitute [word] [substitute]** - will substitute the words in the substitute for the word.  
 **!removesubstitute [word]** - removes the word from the substitute dictionary.  
@@ -47,7 +47,7 @@
 
 ## Compilation Instructions.
  
- A simple bot that uses the twitchlib library and System.Speech.Synthesis windows SAPI5 to speak text written in twitch IRC Chat  
+ A simple bot that uses the twitchlib library and System.Speech.Synthesis windows SAPI5 to speak text written in twitch IRC Chat.  
 
  Dependancies:
 
