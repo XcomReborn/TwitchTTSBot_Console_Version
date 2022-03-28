@@ -5,3 +5,5 @@ data.json
 .vscode
 ignoredWords.json
 ignoredWords.json
+data/twitchUserData.json
+data/substitutionWords.json

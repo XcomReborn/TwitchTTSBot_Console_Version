@@ -47,13 +47,13 @@ namespace TestConsole
         {
 
             // load all tts users
-            users.Load();
+            //users.Load();
             // load ignored words
-            ignoredWords.Load();
+            //ignoredWords.Load();
             // load substitution words
-            substitutionWords.Load();
+            //substitutionWords.Load();
             // load user settings
-            botSettingManager.Load();
+            //botSettingManager.Load();
 
 
             ConnectionCredentials credentials = new ConnectionCredentials(botSettingManager.settings.botName, botSettingManager.settings.botOAuthKey);

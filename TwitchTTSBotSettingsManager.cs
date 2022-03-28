@@ -2,16 +2,21 @@ using Newtonsoft.Json;
 
 [System.Serializable]
 
-class TwitchTTSBotSettingsManager{
+class TwitchTTSBotSettingsManager
+{
 
 
-    public TwitchTTSBotSettings settings;
+    public TwitchTTSBotSettings settings = new TwitchTTSBotSettings();
 
-    public TwitchTTSBotSettingsManager(){
+    public string userSettingsPath = "data/userSettings.json";
+
+    public TwitchTTSBotSettingsManager()
+    {
 
         // attempt to load settings if fails use defaults
-        
-        if (!Load()){
+
+        if (!Load())
+        {
 
             settings = new TwitchTTSBotSettings();
             Save();
@@ -21,13 +26,13 @@ class TwitchTTSBotSettingsManager{
 
     public bool Load()
     {
-    
-       if (File.Exists("userSettings.json"))
+
+        if (File.Exists(userSettingsPath))
         {
 
             try
             {
-                FileStream fs = new FileStream("userSettings.json", FileMode.Open, FileAccess.Read);
+                FileStream fs = new FileStream(userSettingsPath, FileMode.Open, FileAccess.Read);
                 StreamReader sr = new StreamReader(fs);
                 sr.BaseStream.Seek(0, SeekOrigin.Begin);
                 string str = sr.ReadToEnd();
@@ -44,34 +49,39 @@ class TwitchTTSBotSettingsManager{
                 System.Console.WriteLine("A problem occurred while trying to load substitutionWords.json");
                 return false;
             }
-        }else{
+        }
+        else
+        {
             return false;
         }
 
-    
+
         return true;
 
 
     }
 
-    public bool Save(){
-
+    public bool Save()
     {
-        try{
-        FileStream fs = new FileStream("userSettings.json", FileMode.Create, FileAccess.Write);
-        StreamWriter sw = new StreamWriter(fs);
-        string userSettingsJson = JsonConvert.SerializeObject(settings);
-        sw.WriteLine(userSettingsJson);
-        sw.Flush();
-        sw.Close();
-        fs.Close();
+
+        {
+            try
+            {
+                FileStream fs = new FileStream(userSettingsPath, FileMode.Create, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(fs);
+                string userSettingsJson = JsonConvert.SerializeObject(settings);
+                sw.WriteLine(userSettingsJson);
+                sw.Flush();
+                sw.Close();
+                fs.Close();
+            }
+            catch
+            {
+                System.Console.WriteLine("A problem occurred while trying to save userSettings.");
+                return false;
+            }
+            return true;
         }
-        catch{
-            System.Console.WriteLine("A problem occurred while trying to save userSettings.");
-            return false;
-        }
-        return true;
-    }
     }
 
 
@@ -79,7 +89,8 @@ class TwitchTTSBotSettingsManager{
 
 [System.Serializable]
 
-class TwitchTTSBotSettings{
+class TwitchTTSBotSettings
+{
 
     public string botName = "COHopponentBot"; // the bots chat userName
     public string botOAuthKey = "oauth:6lwp9xs2oye948hx2hpv5hilldl68g"; // the key you want to use for connection to the twitch server

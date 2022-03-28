@@ -3,15 +3,24 @@ using System.Linq;
 
 class IgnoredWords
 {
+    
+    private HashSet<string> words = new HashSet<string>();
 
-
-    private HashSet<string> words;
+    private string ignoredWordsPath = "data/ignoredWords.json";
 
 
     public IgnoredWords()
     {
 
-        words = new HashSet<string>();
+        // attempt to load words from file if fails use defaults
+
+        if (!Load())
+        {
+
+            words = new HashSet<string>();
+            Save();
+
+        }       
 
     }
 
@@ -48,12 +57,12 @@ class IgnoredWords
     public bool Load()
     {
 
-        if (File.Exists("ignoredWords.json"))
+        if (File.Exists(ignoredWordsPath))
         {
 
             try
             {
-                FileStream fs = new FileStream("ignoredWords.json", FileMode.Open, FileAccess.Read);
+                FileStream fs = new FileStream(ignoredWordsPath, FileMode.Open, FileAccess.Read);
                 StreamReader sr = new StreamReader(fs);
                 sr.BaseStream.Seek(0, SeekOrigin.Begin);
                 string str = sr.ReadLine();
@@ -82,7 +91,7 @@ class IgnoredWords
     {
         try
         {
-            FileStream fs = new FileStream("ignoredWords.json", FileMode.Create, FileAccess.Write);
+            FileStream fs = new FileStream(ignoredWordsPath, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs);
             string userJson = JsonSerializer.Serialize(words);
             sw.WriteLine(userJson);

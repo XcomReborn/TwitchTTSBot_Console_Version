@@ -5,12 +5,23 @@ using Newtonsoft.Json;
 
 class SubstitutionWords{
 
-    public SubWords subwords;
+    public SubWords subwords = new SubWords();
+
+    public string substitutionWordsPath = "data/substitutionWords.json";
 
 
     public SubstitutionWords(){
 
-        subwords = new SubWords();
+        // attempt to load settings if fails use defaults
+
+        if (!Load())
+        {
+
+            subwords = new SubWords();
+            Save();
+
+        }
+        
 
     }
 
@@ -43,7 +54,7 @@ class SubstitutionWords{
     public bool Save(){
         try
         {
-            FileStream fs = new FileStream("substitutionWords.json", FileMode.Create, FileAccess.Write);
+            FileStream fs = new FileStream(substitutionWordsPath, FileMode.Create, FileAccess.Write);
             StreamWriter sw = new StreamWriter(fs);
             //string userJson = JsonSerializer.Serialize(subwords);
             string userJson = JsonConvert.SerializeObject(subwords);
@@ -63,12 +74,12 @@ class SubstitutionWords{
 
     public bool Load(){
 
-       if (File.Exists("substitutionWords.json"))
+       if (File.Exists(substitutionWordsPath))
         {
 
             try
             {
-                FileStream fs = new FileStream("substitutionWords.json", FileMode.Open, FileAccess.Read);
+                FileStream fs = new FileStream(substitutionWordsPath, FileMode.Open, FileAccess.Read);
                 StreamReader sr = new StreamReader(fs);
                 sr.BaseStream.Seek(0, SeekOrigin.Begin);
                 string str = sr.ReadToEnd();

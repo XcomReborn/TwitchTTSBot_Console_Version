@@ -5,11 +5,22 @@ using System.Text.Json;
 class TwitchUsers
 {
 
-    public List<TwitchUser> users { get; set; }
+    public List<TwitchUser> users { get; set; } = new List<TwitchUser>();
+
+    public string dataPath = "data/twitchUserData.json";
 
     public TwitchUsers()
     {
-        users = new List<TwitchUser>();
+
+        // attempt to load settings if fails use defaults and create file
+        if (!Load())
+        {
+
+            users = new List<TwitchUser>();
+            Save();
+
+        }
+        
     }
 
     public bool AddUser(string username, string alias)
@@ -83,12 +94,12 @@ class TwitchUsers
 
     public bool Load()
     {
-        if (File.Exists("data.json"))
+        if (File.Exists(dataPath))
         {
 
             try
             {
-                FileStream fs = new FileStream("data.json", FileMode.Open, FileAccess.Read);
+                FileStream fs = new FileStream(dataPath, FileMode.Open, FileAccess.Read);
                 StreamReader sr = new StreamReader(fs);
                 sr.BaseStream.Seek(0, SeekOrigin.Begin);
                 string str = sr.ReadLine();
@@ -115,7 +126,7 @@ class TwitchUsers
     public bool Save()
     {
         try{
-        FileStream fs = new FileStream("data.json", FileMode.Create, FileAccess.Write);
+        FileStream fs = new FileStream(dataPath, FileMode.Create, FileAccess.Write);
         StreamWriter sw = new StreamWriter(fs);
         string userJson = JsonSerializer.Serialize(users);
         sw.WriteLine(userJson);
