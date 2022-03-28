@@ -1,8 +1,8 @@
 # CSharpTwitchTTSBot
 
-Downloadable Executable for Windows 10 in Releases:
+##Downloadable Executable for Windows 10 in Releases:
 
-User Instructions for Windows:
+##User Instructions for Windows:
 
 1. Download Release 
 2. Unzip to folder (You can do this with winrar or similar application).
@@ -16,7 +16,7 @@ User Instructions for Windows:
 
 
 
-Compilation Instructions.
+##Compilation Instructions.
  
  A simple bot that uses the twitchlib library and System.Speech.Synthesis windows SAPI5 to speak text written in twitch IRC Chat
 
