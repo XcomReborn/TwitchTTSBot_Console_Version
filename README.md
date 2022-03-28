@@ -24,25 +24,25 @@
 
 ### Bot commands restricted to twitch channel moderators:
 
-!voices - lists all available voices
-!voice # - sets the users voice to an available voice listed in !voices.
-!uservoice [userName] # - sets the userName's voice to an available voice listed in !voices.  
+**!voices** - lists all available voices
+**!voice #** - sets the users voice to an available voice listed in !voices.
+**!uservoice** [userName] # - sets the userName's voice to an available voice listed in !voices.  
 
-!alias [alias] [optional userName] - sets mod username alias
-!useralias [userName] [alias] - sets another users alias
+**!alias** [alias] [optional userName] - sets mod username alias
+**!useralias** [userName] [alias] - sets another users alias
 
-!ignore [userName] - ignores the following user name
-!unignore [userName] - unignores the following user name
-!blacklist - lists all the usernames in the blacklist (!ignorelist)
+**!ignore [userName]** - ignores the following user name
+**!unignore [userName]** - unignores the following user name
+**!blacklist** - lists all the usernames in the blacklist (!ignorelist)
 
-!substitute [word] [substitute] - will substitute the words in the substitute for the word.
-!removesubstitute [word] - removes the word from the substitute dictionary.
+**!substitute [word] [substitute]** - will substitute the words in the substitute for the word.
+**!removesubstitute [word]** - removes the word from the substitute dictionary.
 
 
 ### ==Advanced Commands==
 
-!regex [pattern] [substitute] - will substitute the words in the substitute for the regular expression match in the pattern. Care should be taken not to use a broad match search.
-!removeregex [pattern] - removes the pattern from the regex substitute dictionary.
+**!regex [pattern] [substitute]** - will substitute the words in the substitute for the regular expression match in the pattern. Care should be taken not to use a broad match search.
+**!removeregex [pattern]** - removes the pattern from the regex substitute dictionary.
 
 
 ## Compilation Instructions.
