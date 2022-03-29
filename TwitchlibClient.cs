@@ -183,23 +183,34 @@ namespace TestConsole
                 System.Console.WriteLine("Word Sub Pattern Matches : " + $@"\b({words})\b");
                 // This next line replaces all the dictionary key matches with their value pairs, exclusive bound words. How does it work? No idea!
 
+                try{
                 output = Regex.Replace(e.ChatMessage.Message, $@"\b({words})\b", delegate (Match m) 
                 { 
 
                     return substitutionWords.subwords.words[Regex.Escape(m.Value)].PickRandom();  }  
                 
                 );
+                }catch{
+                    System.Console.WriteLine("Regex match failed.");
+                }
+
+                
 
                 if (substitutionWords.subwords.regularexpressions.Count > 0){
 
                      // this will iterate over regular expressions in the regular expression dictionary so care should be taken with the entered patterns.
                     foreach (KeyValuePair<string, List<string>> item in substitutionWords.subwords.regularexpressions){
+                        try{
                         output = Regex.Replace(output, item.Key, item.Value.PickRandom());
                         System.Console.WriteLine("Regex Sub Pattern Matches : " + item.Key + " : Sub : " + item.Value);
+                        }catch{
+                            System.Console.WriteLine("Regex match failed.");
+                            System.Console.WriteLine("Regex Sub Pattern Matches : " + item.Key + " : Sub : " + item.Value);
+                        }
                     }
 
-
                 }
+                
 
 
 
