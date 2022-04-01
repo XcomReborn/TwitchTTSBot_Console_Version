@@ -25,27 +25,45 @@ class SubstitutionWords{
     }
 
     public bool AddWordPair(string word, string wordToSubstitute){
-        
+
+        try{
         subwords.words.Add(Regex.Escape(word), wordToSubstitute.Split(",").ToList());
         return true;
+        }
+        catch{
+            return false;
+        }
     }
 
     public bool RemoveWord(string word){
 
+        try{
         subwords.words.Remove(word);
         return true;
+        }
+        catch{
+            return false;
+        }
     }
 
     public bool AddRegularExpressionSubPair(string pattern, string wordToSubstitute){
 
+        try{
         subwords.regularexpressions.Add(pattern, wordToSubstitute.Split(",").ToList());
-        return true;
+        return true;}
+        catch{
+            return false;
+        }
     }
 
     public bool RemoveRegularExpressionSubPair(string pattern){
 
+        try{
         subwords.regularexpressions.Remove(pattern);
-        return true;
+        return true;}
+        catch{
+            return false;
+        }
 
     }
 

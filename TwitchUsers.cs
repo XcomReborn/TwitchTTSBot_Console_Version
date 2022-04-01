@@ -43,7 +43,7 @@ class TwitchUsers
             user.name.ToLower();
             users.Add(user);
         }
-        catch { return true; }
+        catch { return false; }
         return true;
     }
 
