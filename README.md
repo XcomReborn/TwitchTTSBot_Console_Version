@@ -29,7 +29,7 @@
 **!voice #** - sets the users voice to an available voice listed in !voices.  
 **!uservoice** [userName] # - sets the userName's voice to an available voice listed in !voices.  
 
-**!alias** [alias] [optional userName] - sets mod username alias.  
+**!alias** [alias] - sets mod username alias.  
 **!useralias** [userName] [alias] - sets another users alias.  
 
 **!ignore [userName]** - ignores the following user name.  
