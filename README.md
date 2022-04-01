@@ -19,18 +19,18 @@
 
 ### Bot commands for Streamer/AdminUserName:
 
-**!ignoreword** [word] - will mute a message containing a specific word eg: http or www.  
-**!unignoreword** [word] - will remove the word from the ignore word list.  
+**!ignoreword [word]** - will mute a message containing a specific word eg: http or www.  
+**!unignoreword [word]** - will remove the word from the ignore word list.  
 **!closetts** - will close the program.  
 
 ### Bot commands restricted to twitch channel moderators:
 
 **!voices** - lists all available voices.  
 **!voice #** - sets the users voice to an available voice listed in !voices.  
-**!uservoice** [userName] # - sets the userName's voice to an available voice listed in !voices.  
+**!uservoice [userName] #** - sets the userName's voice to an available voice listed in !voices.  
 
-**!alias** [alias] - sets mod username alias.  
-**!useralias** [userName] [alias] - sets another users alias.  
+**!alias [alias]** - sets mod username alias.  
+**!useralias [userName] [alias]** - sets another users alias.  
 
 **!ignore [userName]** - ignores the following user name.  
 **!unignore [userName]** - unignores the following user name.  
