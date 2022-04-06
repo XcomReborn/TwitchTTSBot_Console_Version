@@ -8,9 +8,8 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 
-using TextToSpeech;
 
-namespace TwitchBotClient
+namespace TTSBot
 {
     
     class Bot

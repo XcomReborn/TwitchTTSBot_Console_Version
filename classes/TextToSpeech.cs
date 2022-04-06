@@ -14,11 +14,11 @@ using System.Collections.Generic;
 using ExtensionMethods;
 
 
-namespace TextToSpeech{
+namespace TTSBot{
 
     class TextToSpeech{
 
-        private TwitchBotClient.Bot bot;
+        private Bot bot;
 
         private TwitchUsers users = new TwitchUsers();
 
@@ -32,9 +32,11 @@ namespace TextToSpeech{
 
         public bool paused = false;
 
+        private TTSBotCommands commands = new TTSBotCommands();
 
 
-        public TextToSpeech (TwitchBotClient.Bot bot) {
+
+        public TextToSpeech (Bot bot) {
 
             this.bot = bot;
 
@@ -203,115 +205,107 @@ namespace TextToSpeech{
         public void CheckForChatCommands(OnMessageReceivedArgs e)
         {
 
-
             string[] words = e.ChatMessage.Message.Split(' ');
+
 
             if (words.Length > 0)
             {
+
+                // Create new dictionary only where command enabled == true
+                Dictionary<string, Commands> commmandDict = new Dictionary<string, Commands>();
+                foreach(var item in commands.commands){
+                    if (item.Value.enabled == true){
+                        commmandDict.Add(item.Key, item.Value);
+                    }
+                }
 
 
                 // Broadcaster Commands
                 if ((e.ChatMessage.IsBroadcaster) || (bot.botSettingManager.settings.botAdminUserName.ToLower() == e.ChatMessage.Username))
                 {
-                    switch (words[0])
+                    if (commmandDict.ContainsKey("!closetts"))
                     {
-
-                        case "!closetts":
-                            CloseTTS(e);
-                            break;
-                        case "!ignoreword":
-                            SetIgnoreWord(e);
-                            break;
-                        case "!unignoreword":
-                            SetUnignoreWord(e);
-                            break;
-
-                        default:
-                            // code block
-                            break;
+                        if (words[0] == commmandDict["!closetts"].ttsComparisonCommand)
+                        { CloseTTS(e); }
                     }
-
+                    if (commmandDict.ContainsKey("!ignoreword"))
+                    {
+                        if (words[0] == commmandDict["!ignoreword"].ttsComparisonCommand)
+                        { SetIgnoreWord(e); }
+                    }
+                    if (commmandDict.ContainsKey("!unignoreword"))
+                    {
+                        if (words[0] == commmandDict["!unignoreword"].ttsComparisonCommand)
+                        { SetUnignoreWord(e); }
+                    }
                 }
-
 
                 // Moderator commands 
                 if ((e.ChatMessage.IsModerator) || (e.ChatMessage.IsBroadcaster) || (bot.botSettingManager.settings.botAdminUserName.ToLower() == e.ChatMessage.Username))
                 {
-
-                    switch (words[0])
+                    if (commmandDict.ContainsKey("!alias"))
                     {
-                        case "!alias":
-                            SetAlias(e);
-                            break;
-                        case "!useralias":
-                            SetUserAlias(e);
-                            break;
-
-                        case "!blacklist":
-                        case "!ignorelist":
-                            DisplayBlackList(e);
-                            break;
-                        case "!ignore":
-                            SetIgnore(e);
-                            break;
-                        case "!unignore":
-                            SetUnignore(e);
-                            break;
-                        case "!voices":
-                            DisplayAvailableVoices(e);
-                            break;
-                        case "!voice":
-                            SetVoice(e);
-                            break;
-                        case "!uservoice":
-                            SetUserVoice(e);
-                            break;
-                        case "!substitute":
-                            SetSubstituteWord(e);
-                            break;
-                        case "!removesubstitute":
-                            RemoveSubstitute(e);
-                            break;
-                        case "!regex":
-                            SetRegex(e);
-                            break;
-                        case "!removeregex":
-                            RemoveRegex(e);
-                            break;
-                        case "!speed":
-                            // currently not bothering implement this
-                            break;
-                        case "!volume":
-                            // currently not bothering implement this
-                            break;
-
-
-                        default:
-                            // code block
-                            break;
+                        if (words[0] == commmandDict["!alias"].ttsComparisonCommand)
+                        { SetAlias(e); }
                     }
-
-
+                    if (commmandDict.ContainsKey("!useralias"))
+                    {
+                        if (words[0] == commmandDict["!useralias"].ttsComparisonCommand)
+                        { SetUserAlias(e); }
+                    }
+                    if (commmandDict.ContainsKey("!ignorelist"))
+                    {
+                        if (words[0] == commmandDict["!ignorelist"].ttsComparisonCommand)
+                        { DisplayBlackList(e); }
+                    }
+                    if (commmandDict.ContainsKey("!ignore"))
+                    {
+                        if (words[0] == commmandDict["!ignore"].ttsComparisonCommand)
+                        { SetIgnore(e); }
+                    }
+                    if (commmandDict.ContainsKey("!unignore"))
+                    {
+                        if (words[0] == commmandDict["!unignore"].ttsComparisonCommand)
+                        { SetUnignore(e); }
+                    }
+                    if (commmandDict.ContainsKey("!voices"))
+                    {
+                        if (words[0] == commmandDict["!voices"].ttsComparisonCommand)
+                        { DisplayAvailableVoices(e); }
+                    }
+                    if (commmandDict.ContainsKey("!voice"))
+                    {
+                        if (words[0] == commmandDict["!voice"].ttsComparisonCommand)
+                        { SetVoice(e); }
+                    }
+                    if (commmandDict.ContainsKey("!uservoice"))
+                    {
+                        if (words[0] == commmandDict["!uservoice"].ttsComparisonCommand)
+                        { SetUserVoice(e); }
+                    }
+                    if (commmandDict.ContainsKey("!substitute"))
+                    {
+                        if (words[0] == commmandDict["!substitute"].ttsComparisonCommand)
+                        { SetSubstituteWord(e); }
+                    }
+                    if (commmandDict.ContainsKey("!removesubstitute"))
+                    {
+                        if (words[0] == commmandDict["!removesubstitute"].ttsComparisonCommand)
+                        { RemoveSubstitute(e); }
+                    }
+                    if (commmandDict.ContainsKey("!regex"))
+                    {
+                        if (words[0] == commmandDict["!regex"].ttsComparisonCommand)
+                        { SetRegex(e); }
+                    }
+                    if (commmandDict.ContainsKey("!removeregex"))
+                    {
+                        if (words[0] == commmandDict["!removeregex"].ttsComparisonCommand)
+                        { RemoveRegex(e); }
+                    }
                 }
-
-                // extra commands for non mods
-                /*
-                switch (words[0])
-                {
-                    case "!voices":
-                        // code block
-                        break;
-                    default:
-                        // code block
-                        break;
-                }
-
-                */
 
             }
-
-
-
 
         }
 

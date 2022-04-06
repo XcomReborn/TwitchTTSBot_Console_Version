@@ -1,8 +1,5 @@
 
-using TwitchBotClient;
-
-
-namespace MainProgram
+namespace TTSBot
 {
 
     class Program
@@ -12,7 +9,7 @@ namespace MainProgram
 
             Bot bot = new Bot();
 
-            TextToSpeech.TextToSpeech tts = new TextToSpeech.TextToSpeech(bot);
+            TextToSpeech tts = new TextToSpeech(bot);
 
             tts.run();
 
