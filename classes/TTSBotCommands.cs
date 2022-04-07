@@ -21,7 +21,7 @@ class TTSBotCommands{
             { "!ignoreword", new Commands(Commands.UserLevel.STREAMER, "!ignoreword", true , "@ [word]","Adds word to be ignored, will not speak the entire user message.") },
             { "!unignoreword", new Commands(Commands.UserLevel.STREAMER, "!unignoreword", true , "@ [word]" ,"Removes word if it has previously been added to the ignore word list.") },
             { "!alias", new Commands(Commands.UserLevel.MOD, "!alias", true , "@ #","Gives the chat user name an alternative alias in text to speech.") },
-            { "!useralias", new Commands(Commands.UserLevel.MOD, "!userAlias", true , "@ [userName] #","Gives another chat user name an alternative alias in text to speech.") },                
+            { "!useralias", new Commands(Commands.UserLevel.MOD, "!useralias", true , "@ [userName] #","Gives another chat user name an alternative alias in text to speech.") },                
             { "!ignorelist", new Commands(Commands.UserLevel.MOD, "!ignorelist", true , "@","Displays the userNames currently being ignored in chat.") }, 
             { "!ignore", new Commands(Commands.UserLevel.MOD, "!ignore", true , "@ [userName]","Mutes the specified user.") }, 
             { "!unignore", new Commands(Commands.UserLevel.MOD, "!unignore", true , "@ [userName]","Unmutes the specified user.") },  
