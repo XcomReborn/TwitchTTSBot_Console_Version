@@ -205,7 +205,7 @@ class Commands{
 
     public enum UserLevel { USER, VIP,MOD, STREAMER};
 
-    public string name = "";
+    public readonly string name;
 
     public UserLevel privilageLevel = UserLevel.STREAMER;
 
