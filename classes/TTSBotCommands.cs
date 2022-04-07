@@ -1,5 +1,8 @@
 using Newtonsoft.Json;
 using TwitchLib.Client.Events;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 
 namespace TTSBot;
