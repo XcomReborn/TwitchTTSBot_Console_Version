@@ -32,11 +32,13 @@ namespace TTSBot{
 
         public bool paused = false;
 
-        private TTSBotCommands commands = new TTSBotCommands();
+        private TTSBotCommands commands; 
 
 
 
         public TextToSpeech (Bot bot) {
+
+            this.commands =  new TTSBotCommands(this);
 
             this.bot = bot;
 
@@ -212,7 +214,7 @@ namespace TTSBot{
             {
 
                 // Create new dictionary only where command enabled == true
-                Dictionary<string, Commands> commmandDict = new Dictionary<string, Commands>();
+                Dictionary<Delegate, Commands> commmandDict = new Dictionary<Delegate, Commands>();
                 foreach(var item in commands.commands){
                     if (item.Value.enabled == true){
                         commmandDict.Add(item.Key, item.Value);
@@ -221,95 +223,32 @@ namespace TTSBot{
 
 
                 // Broadcaster Commands
-                if ((e.ChatMessage.IsBroadcaster) || (bot.botSettingManager.settings.botAdminUserName.ToLower() == e.ChatMessage.Username))
+                if ((e.ChatMessage.IsBroadcaster) || (bot.botSettingManager.settings.botAdminUserName.ToLower() == e.ChatMessage.Username.ToLower()))
                 {
-                    if (commmandDict.ContainsKey("!closetts"))
-                    {
-                        if (words[0] == commmandDict["!closetts"].ttsComparisonCommand)
-                        { CloseTTS(e); }
-                    }
-                    if (commmandDict.ContainsKey("!ignoreword"))
-                    {
-                        if (words[0] == commmandDict["!ignoreword"].ttsComparisonCommand)
-                        { SetIgnoreWord(e); }
-                    }
-                    if (commmandDict.ContainsKey("!unignoreword"))
-                    {
-                        if (words[0] == commmandDict["!unignoreword"].ttsComparisonCommand)
-                        { SetUnignoreWord(e); }
+                    foreach (var item in commmandDict){
+                        if ((item.Value.ttsComparisonCommand == words[0]) && (item.Value.privilageLevel == Commands.UserLevel.STREAMER)){
+                            item.Key.DynamicInvoke(e);
+                        }
+
                     }
                 }
 
                 // Moderator commands 
-                if ((e.ChatMessage.IsModerator) || (e.ChatMessage.IsBroadcaster) || (bot.botSettingManager.settings.botAdminUserName.ToLower() == e.ChatMessage.Username))
+                if ((e.ChatMessage.IsModerator) || (e.ChatMessage.IsBroadcaster) || (bot.botSettingManager.settings.botAdminUserName.ToLower() == e.ChatMessage.Username.ToLower()))
                 {
-                    if (commmandDict.ContainsKey("!alias"))
-                    {
-                        if (words[0] == commmandDict["!alias"].ttsComparisonCommand)
-                        { SetAlias(e); }
+                    foreach (var item in commmandDict){
+                    if ((item.Value.ttsComparisonCommand == words[0]) && (item.Value.privilageLevel == Commands.UserLevel.MOD)){
+                        item.Key.DynamicInvoke(e);
                     }
-                    if (commmandDict.ContainsKey("!useralias"))
-                    {
-                        if (words[0] == commmandDict["!useralias"].ttsComparisonCommand)
-                        { SetUserAlias(e); }
-                    }
-                    if (commmandDict.ContainsKey("!ignorelist"))
-                    {
-                        if (words[0] == commmandDict["!ignorelist"].ttsComparisonCommand)
-                        { DisplayBlackList(e); }
-                    }
-                    if (commmandDict.ContainsKey("!ignore"))
-                    {
-                        if (words[0] == commmandDict["!ignore"].ttsComparisonCommand)
-                        { SetIgnore(e); }
-                    }
-                    if (commmandDict.ContainsKey("!unignore"))
-                    {
-                        if (words[0] == commmandDict["!unignore"].ttsComparisonCommand)
-                        { SetUnignore(e); }
-                    }
-                    if (commmandDict.ContainsKey("!voices"))
-                    {
-                        if (words[0] == commmandDict["!voices"].ttsComparisonCommand)
-                        { DisplayAvailableVoices(e); }
-                    }
-                    if (commmandDict.ContainsKey("!voice"))
-                    {
-                        if (words[0] == commmandDict["!voice"].ttsComparisonCommand)
-                        { SetVoice(e); }
-                    }
-                    if (commmandDict.ContainsKey("!uservoice"))
-                    {
-                        if (words[0] == commmandDict["!uservoice"].ttsComparisonCommand)
-                        { SetUserVoice(e); }
-                    }
-                    if (commmandDict.ContainsKey("!substitute"))
-                    {
-                        if (words[0] == commmandDict["!substitute"].ttsComparisonCommand)
-                        { SetSubstituteWord(e); }
-                    }
-                    if (commmandDict.ContainsKey("!removesubstitute"))
-                    {
-                        if (words[0] == commmandDict["!removesubstitute"].ttsComparisonCommand)
-                        { RemoveSubstitute(e); }
-                    }
-                    if (commmandDict.ContainsKey("!regex"))
-                    {
-                        if (words[0] == commmandDict["!regex"].ttsComparisonCommand)
-                        { SetRegex(e); }
-                    }
-                    if (commmandDict.ContainsKey("!removeregex"))
-                    {
-                        if (words[0] == commmandDict["!removeregex"].ttsComparisonCommand)
-                        { RemoveRegex(e); }
-                    }
+
+                }                   
                 }
 
             }
 
         }
 
-        private bool SetRegex(OnMessageReceivedArgs e){
+        public bool SetRegex(OnMessageReceivedArgs e){
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 2){
@@ -331,7 +270,7 @@ namespace TTSBot{
 
         }
 
-        private bool RemoveRegex(OnMessageReceivedArgs e){
+        public bool RemoveRegex(OnMessageReceivedArgs e){
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 1){
@@ -358,7 +297,7 @@ namespace TTSBot{
 
         }
         
-        private bool RemoveSubstitute(OnMessageReceivedArgs e){
+        public bool RemoveSubstitute(OnMessageReceivedArgs e){
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 1){
@@ -385,7 +324,7 @@ namespace TTSBot{
 
         }
 
-        private bool SetSubstituteWord(OnMessageReceivedArgs e){
+        public bool SetSubstituteWord(OnMessageReceivedArgs e){
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 2){
@@ -409,7 +348,7 @@ namespace TTSBot{
         }
 
 
-        private bool DisplayBlackList(OnMessageReceivedArgs e){
+        public bool DisplayBlackList(OnMessageReceivedArgs e){
 
 
             
@@ -445,7 +384,7 @@ namespace TTSBot{
 
         }
 
-        private bool SetVoice(OnMessageReceivedArgs e){
+        public bool SetVoice(OnMessageReceivedArgs e){
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 1)
@@ -498,7 +437,7 @@ namespace TTSBot{
 
         }
 
-        private bool SetUserVoice(OnMessageReceivedArgs e){
+        public bool SetUserVoice(OnMessageReceivedArgs e){
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 2)
@@ -554,7 +493,7 @@ namespace TTSBot{
 
         }
 
-        private void DisplayAvailableVoices(OnMessageReceivedArgs e){
+        public bool DisplayAvailableVoices(OnMessageReceivedArgs e){
 
             string voices = "";
 
@@ -599,10 +538,10 @@ namespace TTSBot{
 
 
             bot.client.SendMessage(e.ChatMessage.Channel, String.Format("Available Voices : {0}", voices.Substring(0, Math.Min(voices.Length, 500)))); 
-
+            return true;
         }
 
-        private void SetIgnoreWord(OnMessageReceivedArgs e){
+        public bool SetIgnoreWord(OnMessageReceivedArgs e){
 
 
             
@@ -617,10 +556,12 @@ namespace TTSBot{
 
             }
 
+            return true;
+
 
         }
 
-        private void SetUnignoreWord(OnMessageReceivedArgs e){
+        public bool SetUnignoreWord(OnMessageReceivedArgs e){
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 1)
@@ -631,12 +572,14 @@ namespace TTSBot{
 
                 bot.client.SendMessage(e.ChatMessage.Channel, String.Format("messages containing {0} will not be ignored.", wordList[1]));  
 
-            }            
+            }   
+
+            return true;         
 
 
         }
 
-        private void CloseTTS(OnMessageReceivedArgs e)
+        public bool CloseTTS(OnMessageReceivedArgs e)
         {
 
             System.Console.WriteLine("Closing TTS.");
@@ -645,9 +588,11 @@ namespace TTSBot{
             // BruteForce the Exit
             Environment.Exit(0);
 
+            return true;
+
         }
 
-        private void SetAlias(OnMessageReceivedArgs e)
+        public bool SetAlias(OnMessageReceivedArgs e)
         {
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
@@ -678,17 +623,19 @@ namespace TTSBot{
 
                     users.Save();
 
-                    return;
+                    return true;
 
                 }
 
 
             }
 
+            return true;
+
 
         }
 
-        private void SetUserAlias(OnMessageReceivedArgs e){
+        public bool SetUserAlias(OnMessageReceivedArgs e){
 
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 2)
@@ -718,7 +665,7 @@ namespace TTSBot{
 
                     users.Save();
 
-                    return;
+                    return true;
 
                 }
 
@@ -726,10 +673,10 @@ namespace TTSBot{
             }
 
             bot.client.SendMessage(e.ChatMessage.Channel, String.Format("Correct usage in the form !useralias userName alias"));
-
+            return false;
         }
 
-        private void SetIgnore(OnMessageReceivedArgs e)
+        public bool SetIgnore(OnMessageReceivedArgs e)
         {
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 1)
@@ -761,9 +708,11 @@ namespace TTSBot{
 
             }
 
+            return true;
+
         }
 
-        private void SetUnignore(OnMessageReceivedArgs e)
+        public bool SetUnignore(OnMessageReceivedArgs e)
         {
             string[] wordList = e.ChatMessage.Message.Split(' ');
             if (wordList.Length > 1)
@@ -794,6 +743,7 @@ namespace TTSBot{
 
             }
 
+            return true;
 
         }
 
