@@ -1,5 +1,9 @@
 # CSharpTwitchTTSBot
 
+## THIS IS THE CONSOLE VERSION OF THE APP IF YOU ARE A 'NORMAL' USER YOU PROBABLE WANT THE GRAPHICAL USER INTERFACE VERSION
+
+located here : https://github.com/XcomReborn/CSharpTwitchTTSBotGUI
+
 ## Downloadable Executable for Windows 10 in Releases:
 
 ## User Instructions for Windows:
